@@ -440,6 +440,9 @@ jQuery.extend( {
 			// Default abort message
 			strAbort = "canceled",
 
+			// temp var
+			temp,
+
 			// Fake xhr
 			jqXHR = {
 				readyState: 0,
@@ -609,11 +612,11 @@ jQuery.extend( {
 
 		// Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
 		if ( s.ifModified ) {
-			if ( jQuery.lastModified[ cacheURL ] ) {
-				jqXHR.setRequestHeader( "If-Modified-Since", jQuery.lastModified[ cacheURL ] );
+			if ( temp = jQuery.lastModified[ cacheURL ] ) {
+				jqXHR.setRequestHeader( "If-Modified-Since", temp );
 			}
-			if ( jQuery.etag[ cacheURL ] ) {
-				jqXHR.setRequestHeader( "If-None-Match", jQuery.etag[ cacheURL ] );
+			if ( temp = jQuery.etag[ cacheURL ] ) {
+				jqXHR.setRequestHeader( "If-None-Match", temp );
 			}
 		}
 
@@ -820,7 +823,7 @@ jQuery.extend( {
 	}
 } );
 
-jQuery.each( [ "get", "post" ], function( i, method ) {
+[ "get", "post" ].forEach( function( method ) {
 	jQuery[ method ] = function( url, data, callback, type ) {
 
 		// Shift arguments if data argument was omitted
