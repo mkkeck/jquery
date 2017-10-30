@@ -231,12 +231,13 @@ jQuery.extend( {
 
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
 		var i, l, srcElements, destElements,
-			clone = elem.cloneNode( true ),
-			inPage = jQuery.contains( elem.ownerDocument, elem );
+		    nType  = elem.nodeType,
+		    clone  = elem.cloneNode( true ),
+		    inPage = jQuery.contains( elem.ownerDocument, elem );
 
 		// Fix IE cloning issues
-		if ( !support.noCloneChecked && ( elem.nodeType === 1 || elem.nodeType === 11 ) &&
-				!jQuery.isXMLDoc( elem ) ) {
+		if (!support.noCloneChecked && ( nType === 1 || nType === 11 ) &&
+		    !jQuery.isXMLDoc( elem ) ) {
 
 			// We eschew Sizzle here for performance reasons: http://jsperf.com/getall-vs-sizzle/2
 			destElements = getAll( clone );
@@ -324,7 +325,8 @@ jQuery.fn.extend( {
 			return value === undefined ?
 				jQuery.text( this ) :
 				this.empty().each( function() {
-					if ( this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9 ) {
+					var nType = this.nodeType;
+					if (nType === 1 || nType === 11 || nType === 9) {
 						this.textContent = value;
 					}
 				} );
@@ -333,8 +335,9 @@ jQuery.fn.extend( {
 
 	append: function() {
 		return domManip( this, arguments, function( elem ) {
-			if ( this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9 ) {
-				var target = manipulationTarget( this, elem );
+			var nType = this.nodeType, target;
+			if (nType === 1 || nType === 11 || nType === 9) {
+				target = manipulationTarget(this, elem);
 				target.appendChild( elem );
 			}
 		} );
@@ -342,8 +345,9 @@ jQuery.fn.extend( {
 
 	prepend: function() {
 		return domManip( this, arguments, function( elem ) {
-			if ( this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9 ) {
-				var target = manipulationTarget( this, elem );
+			var nType = this.nodeType, target;
+			if (nType === 1 || nType === 11 || nType === 9) {
+				target = manipulationTarget(this, elem);
 				target.insertBefore( elem, target.firstChild );
 			}
 		} );
@@ -351,16 +355,18 @@ jQuery.fn.extend( {
 
 	before: function() {
 		return domManip( this, arguments, function( elem ) {
-			if ( this.parentNode ) {
-				this.parentNode.insertBefore( elem, this );
+			var parent;
+			if (parent = this.parentNode) {
+				parent.insertBefore(elem, this);
 			}
 		} );
 	},
 
 	after: function() {
 		return domManip( this, arguments, function( elem ) {
-			if ( this.parentNode ) {
-				this.parentNode.insertBefore( elem, this.nextSibling );
+			var parent;
+			if (parent = this.parentNode) {
+				parent.insertBefore(elem, this.nextSibling);
 			}
 		} );
 	},
