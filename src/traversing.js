@@ -93,8 +93,9 @@ jQuery.fn.extend( {
 	},
 
 	addBack: function( selector ) {
+		var prevObject = this.prevObject;
 		return this.add( selector == null ?
-			this.prevObject : this.prevObject.filter( selector )
+		                 prevObject : prevObject.filter(selector)
 		);
 	}
 } );
