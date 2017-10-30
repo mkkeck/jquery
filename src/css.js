@@ -80,34 +80,35 @@ function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {
 		// Otherwise initialize for horizontal or vertical properties
 		name === "width" ? 1 : 0,
 
-		val = 0;
+		val = 0,
+		css = jQuery.css;
 
 	for ( ; i < 4; i += 2 ) {
 
 		// Both box models exclude margin, so add it if we want it
 		if ( extra === "margin" ) {
-			val += jQuery.css( elem, extra + cssExpand[ i ], true, styles );
+			val += css( elem, extra + cssExpand[ i ], true, styles );
 		}
 
 		if ( isBorderBox ) {
 
 			// border-box includes padding, so remove it if we want content
 			if ( extra === "content" ) {
-				val -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+				val -= css( elem, "padding" + cssExpand[ i ], true, styles );
 			}
 
 			// At this point, extra isn't border nor margin, so remove border
 			if ( extra !== "margin" ) {
-				val -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
+				val -= css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 			}
 		} else {
 
 			// At this point, extra isn't content, so add padding
-			val += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			val += css( elem, "padding" + cssExpand[ i ], true, styles );
 
 			// At this point, extra isn't content nor padding, so add border
 			if ( extra !== "padding" ) {
-				val += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
+				val += css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 			}
 		}
 	}
@@ -161,46 +162,44 @@ function getWidthOrHeight( elem, name, extra ) {
 }
 
 function showHide( elements, show ) {
-	var display, elem, hidden,
+	var display, elem, hidden, style,
 		values = [],
 		index = 0,
 		length = elements.length;
 
 	for ( ; index < length; index++ ) {
 		elem = elements[ index ];
-		if ( !elem.style ) {
-			continue;
-		}
+		if ( style = elem.style ) {
+			values[ index ] = dataPriv.get( elem, "olddisplay" );
+			display = style.display;
+			if ( show ) {
 
-		values[ index ] = dataPriv.get( elem, "olddisplay" );
-		display = elem.style.display;
-		if ( show ) {
+				// Reset the inline display of this element to learn if it is
+				// being hidden by cascaded rules or not
+				if ( !values[ index ] && display === "none" ) {
+					style.display = "";
+				}
 
-			// Reset the inline display of this element to learn if it is
-			// being hidden by cascaded rules or not
-			if ( !values[ index ] && display === "none" ) {
-				elem.style.display = "";
-			}
+				// Set elements which have been overridden with display: none
+				// in a stylesheet to whatever the default browser style is
+				// for such an element
+				if ( style.display === "" && isHidden( elem ) ) {
+					values[ index ] = dataPriv.access(
+						elem,
+						"olddisplay",
+						defaultDisplay( elem.nodeName )
+					);
+				}
+			} else {
+				hidden = isHidden( elem );
 
-			// Set elements which have been overridden with display: none
-			// in a stylesheet to whatever the default browser style is
-			// for such an element
-			if ( elem.style.display === "" && isHidden( elem ) ) {
-				values[ index ] = dataPriv.access(
-					elem,
-					"olddisplay",
-					defaultDisplay( elem.nodeName )
-				);
-			}
-		} else {
-			hidden = isHidden( elem );
-
-			if ( display !== "none" || !hidden ) {
-				dataPriv.set(
-					elem,
-					"olddisplay",
-					hidden ? display : jQuery.css( elem, "display" )
-				);
+				if ( display !== "none" || !hidden ) {
+					dataPriv.set(
+						elem,
+						"olddisplay",
+						hidden ? display : jQuery.css( elem, "display" )
+					);
+				}
 			}
 		}
 	}
@@ -209,12 +208,12 @@ function showHide( elements, show ) {
 	// to avoid the constant reflow
 	for ( index = 0; index < length; index++ ) {
 		elem = elements[ index ];
-		if ( !elem.style ) {
-			continue;
+		if ( style = elem.style ) {
+			if ( !show || style.display === "none" || style.display === "" ) {
+				style.display = show ? values[ index ] || "" : "none";
+			}
 		}
-		if ( !show || elem.style.display === "none" || elem.style.display === "" ) {
-			elem.style.display = show ? values[ index ] || "" : "none";
-		}
+
 	}
 
 	return elements;
@@ -239,19 +238,19 @@ jQuery.extend( {
 
 	// Don't automatically add "px" to these possibly-unitless properties
 	cssNumber: {
-		"animationIterationCount": true,
-		"columnCount": true,
-		"fillOpacity": true,
-		"flexGrow": true,
-		"flexShrink": true,
-		"fontWeight": true,
-		"lineHeight": true,
-		"opacity": true,
-		"order": true,
-		"orphans": true,
-		"widows": true,
-		"zIndex": true,
-		"zoom": true
+		animationIterationCount: true,
+		columnCount: true,
+		fillOpacity: true,
+		flexGrow: true,
+		flexShrink: true,
+		fontWeight: true,
+		lineHeight: true,
+		opacity: true,
+		order: true,
+		orphans: true,
+		widows: true,
+		zIndex: true,
+		zoom: true
 	},
 
 	// Add in properties whose names you wish to fix before
@@ -271,13 +270,15 @@ jQuery.extend( {
 		// Make sure that we're working with the right name
 		var ret, type, hooks,
 			origName = jQuery.camelCase( name ),
+			cssProps = jQuery.cssProps,
+			cssHooks = jQuery.cssHooks,
 			style = elem.style;
 
-		name = jQuery.cssProps[ origName ] ||
-			( jQuery.cssProps[ origName ] = vendorPropName( origName ) || origName );
+		name = cssProps[ origName ] ||
+			( cssProps[ origName ] = vendorPropName( origName ) || origName );
 
 		// Gets hook for the prefixed version, then unprefixed version
-		hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
+		hooks = cssHooks[ name ] || cssHooks[ origName ];
 
 		// Check if we're setting a value
 		if ( value !== undefined ) {
@@ -330,14 +331,16 @@ jQuery.extend( {
 
 	css: function( elem, name, extra, styles ) {
 		var val, num, hooks,
-			origName = jQuery.camelCase( name );
+			origName = jQuery.camelCase( name ),
+			cssHooks = jQuery.cssHooks,
+			cssProps = jQuery.cssProps;
 
 		// Make sure that we're working with the right name
-		name = jQuery.cssProps[ origName ] ||
-			( jQuery.cssProps[ origName ] = vendorPropName( origName ) || origName );
+		name = cssProps[ origName ] ||
+			( cssProps[ origName ] = vendorPropName( origName ) || origName );
 
 		// Try prefixed name followed by the unprefixed name
-		hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
+		hooks = cssHooks[ name ] || cssHooks[ origName ];
 
 		// If a hook was provided get the computed value from there
 		if ( hooks && "get" in hooks ) {
