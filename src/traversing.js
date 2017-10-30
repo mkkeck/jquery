@@ -95,7 +95,7 @@ jQuery.fn.extend( {
 	addBack: function( selector ) {
 		var prevObject = this.prevObject;
 		return this.add( selector == null ?
-		                 prevObject : prevObject.filter(selector)
+			prevObject : prevObject.filter( selector )
 		);
 	}
 } );
