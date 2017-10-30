@@ -1,7 +1,13 @@
 define( [
 	"./core",
+	"./var/arr",
+	"./var/push",
+	"./var/slice",
+	"./var/rinputs",
+
 	"../external/sizzle/dist/sizzle"
-], function( jQuery, Sizzle ) {
+], function(jQuery, arr, push, slice, rinputs,
+            Sizzle) {
 
 jQuery.find = Sizzle;
 jQuery.expr = Sizzle.selectors;

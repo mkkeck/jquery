@@ -14,3 +14,5 @@ npm-debug.log
 /node_modules
 
 /test/node_smoke_tests/lib/ensure_iterability.js
+.idea/
+external/sizzle/dist-2.3.3/
