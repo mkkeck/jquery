@@ -54,9 +54,9 @@ function buildParams( prefix, obj, traditional, add ) {
 // key/values into a query string
 jQuery.param = function( a, traditional ) {
 	var prefix,
-	    s        = [],
-	    settings = jQuery.ajaxSettings,
-	    add      = function( key, value ) {
+		s = [],
+		settings = jQuery.ajaxSettings,
+		add = function( key, value ) {
 
 			// If value is a function, invoke it and return its value
 			value = jQuery.isFunction( value ) ? value() : ( value == null ? "" : value );
