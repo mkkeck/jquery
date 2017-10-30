@@ -54,7 +54,8 @@ function genFx( type, includeWidth ) {
 
 function createTween( value, prop, animation ) {
 	var tween,
-		collection = ( Animation.tweeners[ prop ] || [] ).concat( Animation.tweeners[ "*" ] ),
+		tweeners = Animation.tweeners,
+		collection = ( tweeners[ prop ] || [] ).concat( tweeners[ "*" ] ),
 		index = 0,
 		length = collection.length;
 	for ( ; index < length; index++ ) {
@@ -243,7 +244,8 @@ function Animation( elem, properties, options ) {
 	var result,
 		stopped,
 		index = 0,
-		length = Animation.prefilters.length,
+		prefilters = Animation.prefilters,
+		length = prefilters.length,
 		deferred = jQuery.Deferred().always( function() {
 
 			// Don't match elem in the :animated selector
@@ -289,23 +291,25 @@ function Animation( elem, properties, options ) {
 			duration: options.duration,
 			tweens: [],
 			createTween: function( prop, end ) {
-				var tween = jQuery.Tween( elem, animation.opts, prop, end,
-						animation.opts.specialEasing[ prop ] || animation.opts.easing );
+				var opts = animation.opts,
+					tween = jQuery.Tween( elem, opts, prop, end,
+						opts.specialEasing[ prop ] || opts.easing );
 				animation.tweens.push( tween );
 				return tween;
 			},
 			stop: function( gotoEnd ) {
 				var index = 0,
+					tweens = animation.tweens,
 
 					// If we are going to the end, we want to run all the tweens
 					// otherwise we skip this part
-					length = gotoEnd ? animation.tweens.length : 0;
+					length = gotoEnd ? tweens.length : 0;
 				if ( stopped ) {
 					return this;
 				}
 				stopped = true;
 				for ( ; index < length ; index++ ) {
-					animation.tweens[ index ].run( 1 );
+					tweens[ index ].run( 1 );
 				}
 
 				// Resolve when we played the last frame; otherwise, reject
@@ -318,15 +322,15 @@ function Animation( elem, properties, options ) {
 				return this;
 			}
 		} ),
-		props = animation.props;
-
-	propFilter( props, animation.opts.specialEasing );
+		props = animation.props,
+		opts = animation.opts;
+	propFilter( props, opts.specialEasing );
 
 	for ( ; index < length ; index++ ) {
-		result = Animation.prefilters[ index ].call( animation, elem, props, animation.opts );
+		result = prefilters[ index ].call( animation, elem, props, opts );
 		if ( result ) {
 			if ( jQuery.isFunction( result.stop ) ) {
-				jQuery._queueHooks( animation.elem, animation.opts.queue ).stop =
+				jQuery._queueHooks( animation.elem, opts.queue ).stop =
 					jQuery.proxy( result.stop, result );
 			}
 			return result;
@@ -335,23 +339,23 @@ function Animation( elem, properties, options ) {
 
 	jQuery.map( props, createTween, animation );
 
-	if ( jQuery.isFunction( animation.opts.start ) ) {
-		animation.opts.start.call( elem, animation );
+	if ( jQuery.isFunction( opts.start ) ) {
+		opts.start.call( elem, animation );
 	}
 
 	jQuery.fx.timer(
 		jQuery.extend( tick, {
 			elem: elem,
 			anim: animation,
-			queue: animation.opts.queue
+			queue: opts.queue
 		} )
 	);
 
 	// attach callbacks from options
-	return animation.progress( animation.opts.progress )
-		.done( animation.opts.done, animation.opts.complete )
-		.fail( animation.opts.fail )
-		.always( animation.opts.always );
+	return animation.progress( opts.progress )
+		.done( opts.done, opts.complete )
+		.fail( opts.fail )
+		.always( opts.always );
 }
 
 jQuery.Animation = jQuery.extend( Animation, {
@@ -373,37 +377,40 @@ jQuery.Animation = jQuery.extend( Animation, {
 
 		var prop,
 			index = 0,
-			length = props.length;
+			length = props.length,
+			tweeners = Animation.tweeners;
 
 		for ( ; index < length ; index++ ) {
 			prop = props[ index ];
-			Animation.tweeners[ prop ] = Animation.tweeners[ prop ] || [];
-			Animation.tweeners[ prop ].unshift( callback );
+			tweeners[ prop ] = tweeners[ prop ] || [];
+			tweeners[ prop ].unshift( callback );
 		}
 	},
 
 	prefilters: [ defaultPrefilter ],
 
 	prefilter: function( callback, prepend ) {
+		var prefilters = Animation.prefilters;
 		if ( prepend ) {
-			Animation.prefilters.unshift( callback );
+			prefilters.unshift( callback );
 		} else {
-			Animation.prefilters.push( callback );
+			prefilters.push( callback );
 		}
 	}
 } );
 
 jQuery.speed = function( speed, easing, fn ) {
-	var opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
+	var fx = jQuery.fx,
+		opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
 		complete: fn || !fn && easing ||
 			jQuery.isFunction( speed ) && speed,
 		duration: speed,
 		easing: fn && easing || easing && !jQuery.isFunction( easing ) && easing
 	};
 
-	opt.duration = jQuery.fx.off ? 0 : typeof opt.duration === "number" ?
-		opt.duration : opt.duration in jQuery.fx.speeds ?
-			jQuery.fx.speeds[ opt.duration ] : jQuery.fx.speeds._default;
+	opt.duration = fx.off ? 0 : typeof opt.duration === "number" ?
+		opt.duration : opt.duration in fx.speeds ?
+			fx.speeds[ opt.duration ] : fx.speeds._default;
 
 	// Normalize opt.queue - true/undefined/null -> "fx"
 	if ( opt.queue == null || opt.queue === true ) {
