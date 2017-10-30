@@ -5,13 +5,14 @@ define( [
 // Mark scripts as having already been evaluated
 function setGlobalEval( elems, refElements ) {
 	var i = 0,
-		l = elems.length;
+		l = elems.length,
+		g = "globalEval";
 
 	for ( ; i < l; i++ ) {
 		dataPriv.set(
 			elems[ i ],
-			"globalEval",
-			!refElements || dataPriv.get( refElements[ i ], "globalEval" )
+			g,
+			!refElements || dataPriv.get( refElements[ i ], g )
 		);
 	}
 }
