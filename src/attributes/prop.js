@@ -1,12 +1,12 @@
 define( [
 	"../core",
 	"../core/access",
+	"../var/rinputs",
 	"./support",
 	"../selector"
-], function( jQuery, access, support ) {
+], function( jQuery, access, rinputs, support ) {
 
-var rfocusable = /^(?:input|select|textarea|button)$/i,
-	rclickable = /^(?:a|area)$/i;
+var rclickable = /^(?:a|area)$/i;
 
 jQuery.fn.extend( {
 	prop: function( name, value ) {
@@ -65,7 +65,7 @@ jQuery.extend( {
 
 				return tabindex ?
 					parseInt( tabindex, 10 ) :
-					rfocusable.test( elem.nodeName ) ||
+					rinputs.test( elem.nodeName ) ||
 						rclickable.test( elem.nodeName ) && elem.href ?
 							0 :
 							-1;
@@ -88,38 +88,30 @@ jQuery.extend( {
 if ( !support.optSelected ) {
 	jQuery.propHooks.selected = {
 		get: function( elem ) {
-			var parent = elem.parentNode;
-			if ( parent && parent.parentNode ) {
-				parent.parentNode.selectedIndex;
+			var parent = elem.parentNode, grandpa;
+			if ( parent && ( grandpa = parent.parentNode ) ) {
+				grandpa.selectedIndex;
 			}
 			return null;
 		},
 		set: function( elem ) {
-			var parent = elem.parentNode;
+			var parent = elem.parentNode, grandpa;
 			if ( parent ) {
 				parent.selectedIndex;
 
-				if ( parent.parentNode ) {
-					parent.parentNode.selectedIndex;
+				if ( grandpa = parent.parentNode ) {
+					grandpa.selectedIndex;
 				}
 			}
 		}
 	};
 }
 
-jQuery.each( [
-	"tabIndex",
-	"readOnly",
-	"maxLength",
-	"cellSpacing",
-	"cellPadding",
-	"rowSpan",
-	"colSpan",
-	"useMap",
-	"frameBorder",
-	"contentEditable"
-], function() {
-	jQuery.propFix[ this.toLowerCase() ] = this;
+(
+	"tabIndex readOnly maxLength cellSpacing cellPadding " +
+	"rowSpan colSpan useMap frameBorder contentEditable"
+).split( " " ).forEach( function( item ) {
+	jQuery.propFix[ item.toLowerCase() ] = item;
 } );
 
 } );

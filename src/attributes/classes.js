@@ -113,7 +113,8 @@ jQuery.fn.extend( {
 		}
 
 		return this.each( function() {
-			var className, i, self, classNames;
+			var className, i, self, classNames,
+				classPriv = "__className__";
 
 			if ( type === "string" ) {
 
@@ -138,7 +139,7 @@ jQuery.fn.extend( {
 				if ( className ) {
 
 					// Store className if set
-					dataPriv.set( this, "__className__", className );
+					dataPriv.set( this, classPriv, className );
 				}
 
 				// If the element has a class name or if we're passed `false`,
@@ -149,7 +150,7 @@ jQuery.fn.extend( {
 					this.setAttribute( "class",
 						className || value === false ?
 						"" :
-						dataPriv.get( this, "__className__" ) || ""
+						dataPriv.get( this, classPriv ) || ""
 					);
 				}
 			}

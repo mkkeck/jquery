@@ -10,12 +10,13 @@ var rreturn = /\r/g,
 jQuery.fn.extend( {
 	val: function( value ) {
 		var hooks, ret, isFunction,
-			elem = this[ 0 ];
+			elem = this[ 0 ],
+			valHooks = jQuery.valHooks;
 
 		if ( !arguments.length ) {
 			if ( elem ) {
-				hooks = jQuery.valHooks[ elem.type ] ||
-					jQuery.valHooks[ elem.nodeName.toLowerCase() ];
+				hooks = valHooks[ elem.type ] ||
+					valHooks[ elem.nodeName.toLowerCase() ];
 
 				if ( hooks &&
 					"get" in hooks &&
@@ -41,7 +42,7 @@ jQuery.fn.extend( {
 		isFunction = jQuery.isFunction( value );
 
 		return this.each( function( i ) {
-			var val;
+			var val, valHooks = jQuery.valHooks;
 
 			if ( this.nodeType !== 1 ) {
 				return;
@@ -66,7 +67,7 @@ jQuery.fn.extend( {
 				} );
 			}
 
-			hooks = jQuery.valHooks[ this.type ] || jQuery.valHooks[ this.nodeName.toLowerCase() ];
+			hooks = valHooks[ this.type ] || valHooks[ this.nodeName.toLowerCase() ];
 
 			// If set returns undefined, fall back to normal setting
 			if ( !hooks || !( "set" in hooks ) || hooks.set( this, val, "value" ) === undefined ) {
@@ -159,8 +160,8 @@ jQuery.extend( {
 } );
 
 // Radios and checkboxes getter/setter
-jQuery.each( [ "radio", "checkbox" ], function() {
-	jQuery.valHooks[ this ] = {
+[ "radio", "checkbox" ].forEach( function( name ) {
+	var valHooks = jQuery.valHooks[ name ] = {
 		set: function( elem, value ) {
 			if ( jQuery.isArray( value ) ) {
 				return ( elem.checked = jQuery.inArray( jQuery( elem ).val(), value ) > -1 );
@@ -168,7 +169,7 @@ jQuery.each( [ "radio", "checkbox" ], function() {
 		}
 	};
 	if ( !support.checkOn ) {
-		jQuery.valHooks[ this ].get = function( elem ) {
+		valHooks.get = function( elem ) {
 			return elem.getAttribute( "value" ) === null ? "on" : elem.value;
 		};
 	}
