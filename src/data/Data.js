@@ -13,24 +13,25 @@ Data.uid = 1;
 Data.prototype = {
 
 	register: function( owner, initial ) {
-		var value = initial || {};
+		var expando = this.expando,
+			value = initial || {};
 
 		// If it is a node unlikely to be stringify-ed or looped over
 		// use plain assignment
 		if ( owner.nodeType ) {
-			owner[ this.expando ] = value;
+			owner[ expando ] = value;
 
 		// Otherwise secure it in a non-enumerable, non-writable property
 		// configurability must be true to allow the property to be
 		// deleted with the delete operator
 		} else {
-			Object.defineProperty( owner, this.expando, {
+			Object.defineProperty( owner, expando, {
 				value: value,
 				writable: true,
 				configurable: true
 			} );
 		}
-		return owner[ this.expando ];
+		return owner[ expando ];
 	},
 	cache: function( owner ) {
 
@@ -42,7 +43,9 @@ Data.prototype = {
 		}
 
 		// Check if the owner object already has a cache
-		var value = owner[ this.expando ];
+		var
+			expando = this.expando,
+			value = owner[ expando ];
 
 		// If not, create one
 		if ( !value ) {
@@ -56,13 +59,13 @@ Data.prototype = {
 				// If it is a node unlikely to be stringify-ed or looped over
 				// use plain assignment
 				if ( owner.nodeType ) {
-					owner[ this.expando ] = value;
+					owner[ expando ] = value;
 
 				// Otherwise secure it in a non-enumerable property
 				// configurable must be true to allow the property to be
 				// deleted when data is removed
 				} else {
-					Object.defineProperty( owner, this.expando, {
+					Object.defineProperty( owner, expando, {
 						value: value,
 						configurable: true
 					} );
@@ -91,9 +94,10 @@ Data.prototype = {
 		return cache;
 	},
 	get: function( owner, key ) {
+		var expando = this.expando;
 		return key === undefined ?
 			this.cache( owner ) :
-			owner[ this.expando ] && owner[ this.expando ][ key ];
+			owner[ expando ] && owner[ expando ][ key ];
 	},
 	access: function( owner, key, value ) {
 		var stored;
@@ -132,7 +136,8 @@ Data.prototype = {
 	},
 	remove: function( owner, key ) {
 		var i, name, camel,
-			cache = owner[ this.expando ];
+			expando = this.expando,
+			cache = owner[ expando ];
 
 		if ( cache === undefined ) {
 			return;
@@ -184,9 +189,9 @@ Data.prototype = {
 			// from DOM nodes, so set to undefined instead
 			// https://code.google.com/p/chromium/issues/detail?id=378607
 			if ( owner.nodeType ) {
-				owner[ this.expando ] = undefined;
+				owner[ expando ] = undefined;
 			} else {
-				delete owner[ this.expando ];
+				delete owner[ expando ];
 			}
 		}
 	},

@@ -4,6 +4,7 @@ define( function() {
  * Determines whether an object can have data
  */
 return function( owner ) {
+	var nType = owner.nodeType;
 
 	// Accepts only:
 	//  - Node
@@ -12,7 +13,7 @@ return function( owner ) {
 	//  - Object
 	//    - Any
 	/* jshint -W018 */
-	return owner.nodeType === 1 || owner.nodeType === 9 || !( +owner.nodeType );
+	return nType === 1 || nType === 9 || !( +nType );
 };
 
 } );
