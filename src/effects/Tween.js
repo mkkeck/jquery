@@ -20,33 +20,37 @@ Tween.prototype = {
 		this.unit = unit || ( jQuery.cssNumber[ prop ] ? "" : "px" );
 	},
 	cur: function() {
-		var hooks = Tween.propHooks[ this.prop ];
+		var
+			propHooks = Tween.propHooks,
+			hooks = propHooks[ this.prop ];
 
 		return hooks && hooks.get ?
 			hooks.get( this ) :
-			Tween.propHooks._default.get( this );
+			propHooks._default.get( this );
 	},
 	run: function( percent ) {
 		var eased,
-			hooks = Tween.propHooks[ this.prop ];
+			propHooks = Tween.propHooks,
+			options = this.options,
+			hooks = propHooks[ this.prop ];
 
-		if ( this.options.duration ) {
+		if ( options.duration ) {
 			this.pos = eased = jQuery.easing[ this.easing ](
-				percent, this.options.duration * percent, 0, 1, this.options.duration
+				percent, options.duration * percent, 0, 1, options.duration
 			);
 		} else {
 			this.pos = eased = percent;
 		}
 		this.now = ( this.end - this.start ) * eased + this.start;
 
-		if ( this.options.step ) {
-			this.options.step.call( this.elem, this.now, this );
+		if ( options.step ) {
+			options.step.call( this.elem, this.now, this );
 		}
 
 		if ( hooks && hooks.set ) {
 			hooks.set( this );
 		} else {
-			Tween.propHooks._default.set( this );
+			propHooks._default.set( this );
 		}
 		return this;
 	}
@@ -57,37 +61,40 @@ Tween.prototype.init.prototype = Tween.prototype;
 Tween.propHooks = {
 	_default: {
 		get: function( tween ) {
-			var result;
+			var result,
+			elem = tween.elem;
 
 			// Use a property on the element directly when it is not a DOM element,
 			// or when there is no matching style property that exists.
-			if ( tween.elem.nodeType !== 1 ||
-				tween.elem[ tween.prop ] != null && tween.elem.style[ tween.prop ] == null ) {
-				return tween.elem[ tween.prop ];
+			if ( elem.nodeType !== 1 ||
+				elem[ tween.prop ] != null && elem.style[ tween.prop ] == null ) {
+				return elem[ tween.prop ];
 			}
 
 			// Passing an empty string as a 3rd parameter to .css will automatically
 			// attempt a parseFloat and fallback to a string if the parse fails.
 			// Simple values such as "10px" are parsed to Float;
 			// complex values such as "rotate(1rad)" are returned as-is.
-			result = jQuery.css( tween.elem, tween.prop, "" );
+			result = jQuery.css( elem, tween.prop, "" );
 
 			// Empty strings, null, undefined and "auto" are converted to 0.
 			return !result || result === "auto" ? 0 : result;
 		},
 		set: function( tween ) {
+			var fx = jQuery.fx,
+				elem = tween.elem;
 
 			// Use step hook for back compat.
 			// Use cssHook if its there.
 			// Use .style if available and use plain properties where available.
-			if ( jQuery.fx.step[ tween.prop ] ) {
-				jQuery.fx.step[ tween.prop ]( tween );
-			} else if ( tween.elem.nodeType === 1 &&
-				( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null ||
+			if ( fx.step[ tween.prop ] ) {
+				fx.step[ tween.prop ]( tween );
+			} else if ( elem.nodeType === 1 &&
+				( elem.style[ jQuery.cssProps[ tween.prop ] ] != null ||
 					jQuery.cssHooks[ tween.prop ] ) ) {
-				jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
+				jQuery.style( elem, tween.prop, tween.now + tween.unit );
 			} else {
-				tween.elem[ tween.prop ] = tween.now;
+				elem[ tween.prop ] = tween.now;
 			}
 		}
 	}
@@ -97,8 +104,9 @@ Tween.propHooks = {
 // Panic based approach to setting things on disconnected nodes
 Tween.propHooks.scrollTop = Tween.propHooks.scrollLeft = {
 	set: function( tween ) {
-		if ( tween.elem.nodeType && tween.elem.parentNode ) {
-			tween.elem[ tween.prop ] = tween.now;
+		var elem = tween.elem;
+		if ( elem.nodeType && elem.parentNode ) {
+			elem[ tween.prop ] = tween.now;
 		}
 	}
 };
