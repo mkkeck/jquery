@@ -54,8 +54,9 @@ function buildParams( prefix, obj, traditional, add ) {
 // key/values into a query string
 jQuery.param = function( a, traditional ) {
 	var prefix,
-		s = [],
-		add = function( key, value ) {
+	    s        = [],
+	    settings = jQuery.ajaxSettings,
+	    add      = function( key, value ) {
 
 			// If value is a function, invoke it and return its value
 			value = jQuery.isFunction( value ) ? value() : ( value == null ? "" : value );
@@ -64,7 +65,7 @@ jQuery.param = function( a, traditional ) {
 
 	// Set traditional to true for jQuery <= 1.3.2 behavior.
 	if ( traditional === undefined ) {
-		traditional = jQuery.ajaxSettings && jQuery.ajaxSettings.traditional;
+		traditional = settings && settings.traditional;
 	}
 
 	// If an array was passed in, assume that it is an array of form elements.
