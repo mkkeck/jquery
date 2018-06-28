@@ -1,9 +1,11 @@
 define( [
 	"./core",
 	"./data/var/dataPriv",
+	"./var/undef",
+
 	"./deferred",
 	"./callbacks"
-], function( jQuery, dataPriv ) {
+], function( jQuery, dataPriv, undef ) {
 
 jQuery.extend( {
 	queue: function( elem, type, data ) {
@@ -31,13 +33,14 @@ jQuery.extend( {
 		var queue = jQuery.queue( elem, type ),
 			startLength = queue.length,
 			fn = queue.shift(),
+			inp = "inprogress",
 			hooks = jQuery._queueHooks( elem, type ),
 			next = function() {
 				jQuery.dequeue( elem, type );
 			};
 
 		// If the fx queue is dequeued, always remove the progress sentinel
-		if ( fn === "inprogress" ) {
+		if ( fn === inp ) {
 			fn = queue.shift();
 			startLength--;
 		}
@@ -47,7 +50,7 @@ jQuery.extend( {
 			// Add a progress sentinel to prevent the fx queue from being
 			// automatically dequeued
 			if ( type === "fx" ) {
-				queue.unshift( "inprogress" );
+				queue.unshift( inp );
 			}
 
 			// Clear up the last queue stop function
@@ -85,7 +88,7 @@ jQuery.fn.extend( {
 			return jQuery.queue( this[ 0 ], type );
 		}
 
-		return data === undefined ?
+		return data === undef ?
 			this :
 			this.each( function() {
 				var queue = jQuery.queue( this, type, data );
@@ -123,7 +126,7 @@ jQuery.fn.extend( {
 
 		if ( typeof type !== "string" ) {
 			obj = type;
-			type = undefined;
+			type = undef;
 		}
 		type = type || "fx";
 

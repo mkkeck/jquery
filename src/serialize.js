@@ -1,10 +1,12 @@
 define( [
 	"./core",
 	"./manipulation/var/rcheckableType",
+	"./var/domNode",
+
 	"./core/init",
 	"./traversing", // filter
 	"./attributes/prop"
-], function( jQuery, rcheckableType ) {
+], function( jQuery, rcheckableType, domNode ) {
 
 var r20 = /%20/g,
 	rbracket = /\[\]$/,
@@ -13,7 +15,7 @@ var r20 = /%20/g,
 	rsubmittable = /^(?:input|select|textarea|keygen)/i;
 
 function buildParams( prefix, obj, traditional, add ) {
-	var name;
+	var name, o = "object";
 
 	if ( jQuery.isArray( obj ) ) {
 
@@ -28,7 +30,7 @@ function buildParams( prefix, obj, traditional, add ) {
 
 				// Item is non-scalar (array or object), encode its numeric index.
 				buildParams(
-					prefix + "[" + ( typeof v === "object" && v != null ? i : "" ) + "]",
+					prefix + "[" + ( typeof v === o && v != null ? i : "" ) + "]",
 					v,
 					traditional,
 					add
@@ -36,7 +38,7 @@ function buildParams( prefix, obj, traditional, add ) {
 			}
 		} );
 
-	} else if ( !traditional && jQuery.type( obj ) === "object" ) {
+	} else if ( !traditional && jQuery.type( obj ) === o ) {
 
 		// Serialize object item.
 		for ( name in obj ) {
@@ -105,7 +107,7 @@ jQuery.fn.extend( {
 
 			// Use .is( ":disabled" ) so that fieldset[disabled] works
 			return this.name && !jQuery( this ).is( ":disabled" ) &&
-				rsubmittable.test( this.nodeName ) && !rsubmitterTypes.test( type ) &&
+				rsubmittable.test( this[ domNode ] ) && !rsubmitterTypes.test( type ) &&
 				( this.checked || !rcheckableType.test( type ) );
 		} )
 		.map( function( i, elem ) {

@@ -1,12 +1,19 @@
 define( [
 	"../core",
 	"../var/document",
+	"../var/getOwnDoc",
+	"../var/domType",
+	"../var/domParent",
 	"../data/var/dataPriv",
 	"../data/var/acceptData",
 	"../var/hasOwn",
+	"../var/undef",
 
 	"../event"
-], function( jQuery, document, dataPriv, acceptData, hasOwn ) {
+], function(
+	jQuery, document, getOwnDoc, domType, domParent, dataPriv,
+	acceptData, hasOwn, undef
+) {
 
 var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/;
 
@@ -16,13 +23,14 @@ jQuery.extend( jQuery.event, {
 
 		var i, cur, tmp, bubbleType, ontype, handle, special,
 			eventPath = [ elem || document ],
+			ns = "namespace",
 			type = hasOwn.call( event, "type" ) ? event.type : event,
-			namespaces = hasOwn.call( event, "namespace" ) ? event.namespace.split( "." ) : [];
+			namespaces = hasOwn.call( event, ns ) ? event[ ns ].split( "." ) : [];
 
 		cur = tmp = elem = elem || document;
 
 		// Don't do events on text and comment nodes
-		if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
+		if ( elem[ domType ] === 3 || elem[ domType ] === 8 ) {
 			return;
 		}
 
@@ -47,13 +55,13 @@ jQuery.extend( jQuery.event, {
 
 		// Trigger bitmask: & 1 for native handlers; & 2 for jQuery (always true)
 		event.isTrigger = onlyHandlers ? 2 : 3;
-		event.namespace = namespaces.join( "." );
-		event.rnamespace = event.namespace ?
+		event[ ns ] = namespaces.join( "." );
+		event[ "r" + ns ] = event[ ns ] ?
 			new RegExp( "(^|\\.)" + namespaces.join( "\\.(?:.*\\.|)" ) + "(\\.|$)" ) :
 			null;
 
 		// Clean up the event in case it is being reused
-		event.result = undefined;
+		event.result = undef;
 		if ( !event.target ) {
 			event.target = elem;
 		}
@@ -75,15 +83,15 @@ jQuery.extend( jQuery.event, {
 
 			bubbleType = special.delegateType || type;
 			if ( !rfocusMorph.test( bubbleType + type ) ) {
-				cur = cur.parentNode;
+				cur = cur[ domParent ];
 			}
-			for ( ; cur; cur = cur.parentNode ) {
+			for ( ; cur; cur = cur[ domParent ] ) {
 				eventPath.push( cur );
 				tmp = cur;
 			}
 
 			// Only add window if we got to document (e.g., not plain obj or detached DOM)
-			if ( tmp === ( elem.ownerDocument || document ) ) {
+			if ( tmp === ( elem[ getOwnDoc ] || document ) ) {
 				eventPath.push( tmp.defaultView || tmp.parentWindow || window );
 			}
 		}
@@ -135,7 +143,7 @@ jQuery.extend( jQuery.event, {
 					// Prevent re-triggering of the same event, since we already bubbled it above
 					jQuery.event.triggered = type;
 					elem[ type ]();
-					jQuery.event.triggered = undefined;
+					jQuery.event.triggered = undef;
 
 					if ( tmp ) {
 						elem[ ontype ] = tmp;

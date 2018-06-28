@@ -4,10 +4,18 @@ define( [
 	"./traversing/var/dir",
 	"./traversing/var/siblings",
 	"./traversing/var/rneedsContext",
+	"./var/domType",
+	"./var/domParent",
+	"./var/domNext",
+	"./var/domPrev",
+
 	"./core/init",
 	"./traversing/findFilter",
 	"./selector"
-], function( jQuery, indexOf, dir, siblings, rneedsContext ) {
+], function(
+	jQuery, indexOf, dir, siblings, rneedsContext,
+	domType, domParent, domNext, domPrev
+) {
 
 var rparentsprev = /^(?:parents|prev(?:Until|All))/,
 
@@ -21,10 +29,10 @@ var rparentsprev = /^(?:parents|prev(?:Until|All))/,
 
 jQuery.fn.extend( {
 	has: function( target ) {
-		var targets = jQuery( target, this ),
+		var t = this, targets = jQuery( target, t ),
 			l = targets.length;
 
-		return this.filter( function() {
+		return t.filter( function() {
 			var i = 0;
 			for ( ; i < l; i++ ) {
 				if ( jQuery.contains( this, targets[ i ] ) ) {
@@ -35,23 +43,24 @@ jQuery.fn.extend( {
 	},
 
 	closest: function( selectors, context ) {
-		var cur,
+		var cur, nt, t = this,
 			i = 0,
-			l = this.length,
+			l = t.length,
 			matched = [],
 			pos = rneedsContext.test( selectors ) || typeof selectors !== "string" ?
-				jQuery( selectors, context || this.context ) :
+				jQuery( selectors, context || t.context ) :
 				0;
 
 		for ( ; i < l; i++ ) {
-			for ( cur = this[ i ]; cur && cur !== context; cur = cur.parentNode ) {
+			for ( cur = t[ i ]; cur && cur !== context; cur = cur[ domParent ] ) {
+				nt = cur[ domType ];
 
 				// Always skip document fragments
-				if ( cur.nodeType < 11 && ( pos ?
+				if ( nt < 11 && ( pos ?
 					pos.index( cur ) > -1 :
 
 					// Don't pass non-elements to Sizzle
-					cur.nodeType === 1 &&
+					nt === 1 &&
 						jQuery.find.matchesSelector( cur, selectors ) ) ) {
 
 					matched.push( cur );
@@ -60,24 +69,25 @@ jQuery.fn.extend( {
 			}
 		}
 
-		return this.pushStack( matched.length > 1 ? jQuery.uniqueSort( matched ) : matched );
+		return t.pushStack( matched.length > 1 ? jQuery.uniqueSort( matched ) : matched );
 	},
 
 	// Determine the position of an element within the set
 	index: function( elem ) {
+		var t = this;
 
 		// No argument, return index in parent
 		if ( !elem ) {
-			return ( this[ 0 ] && this[ 0 ].parentNode ) ? this.first().prevAll().length : -1;
+			return ( t[ 0 ] && t[ 0 ][ domParent ] ) ? t.first().prevAll().length : -1;
 		}
 
 		// Index in selector
 		if ( typeof elem === "string" ) {
-			return indexOf.call( jQuery( elem ), this[ 0 ] );
+			return indexOf.call( jQuery( elem ), t[ 0 ] );
 		}
 
 		// Locate the position of the desired element
-		return indexOf.call( this,
+		return indexOf.call( t,
 
 			// If it receives a jQuery object, the first element is used
 			elem.jquery ? elem[ 0 ] : elem
@@ -101,41 +111,41 @@ jQuery.fn.extend( {
 } );
 
 function sibling( cur, dir ) {
-	while ( ( cur = cur[ dir ] ) && cur.nodeType !== 1 ) {}
+	while ( ( cur = cur[ dir ] ) && cur[ domType ] !== 1 ) {}
 	return cur;
 }
 
 jQuery.each( {
 	parent: function( elem ) {
-		var parent = elem.parentNode;
-		return parent && parent.nodeType !== 11 ? parent : null;
+		var parent = elem[ domParent ];
+		return parent && parent[ domType ] !== 11 ? parent : null;
 	},
 	parents: function( elem ) {
-		return dir( elem, "parentNode" );
+		return dir( elem, domParent );
 	},
 	parentsUntil: function( elem, i, until ) {
-		return dir( elem, "parentNode", until );
+		return dir( elem, domParent, until );
 	},
 	next: function( elem ) {
-		return sibling( elem, "nextSibling" );
+		return sibling( elem, domNext );
 	},
 	prev: function( elem ) {
-		return sibling( elem, "previousSibling" );
+		return sibling( elem, domPrev );
 	},
 	nextAll: function( elem ) {
-		return dir( elem, "nextSibling" );
+		return dir( elem, domNext );
 	},
 	prevAll: function( elem ) {
-		return dir( elem, "previousSibling" );
+		return dir( elem, domPrev );
 	},
 	nextUntil: function( elem, i, until ) {
-		return dir( elem, "nextSibling", until );
+		return dir( elem, domNext, until );
 	},
 	prevUntil: function( elem, i, until ) {
-		return dir( elem, "previousSibling", until );
+		return dir( elem, domPrev, until );
 	},
 	siblings: function( elem ) {
-		return siblings( ( elem.parentNode || {} ).firstChild, elem );
+		return siblings( ( elem[ domParent ] || {} ).firstChild, elem );
 	},
 	children: function( elem ) {
 		return siblings( elem.firstChild );

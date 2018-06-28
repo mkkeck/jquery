@@ -6,6 +6,7 @@ function showHide( elements, show ) {
 	var display, elem,
 		values = [],
 		index = 0,
+		none = "none",
 		length = elements.length;
 
 	// Determine new display value for elements that need to change
@@ -17,14 +18,14 @@ function showHide( elements, show ) {
 
 		display = elem.style.display;
 		if ( show ) {
-			if ( display === "none" ) {
+			if ( display === none ) {
 
 				// Restore a pre-hide() value if we have one
 				values[ index ] = dataPriv.get( elem, "display" ) || "";
 			}
 		} else {
-			if ( display !== "none" ) {
-				values[ index ] = "none";
+			if ( display !== none ) {
+				values[ index ] = none;
 
 				// Remember the value we're replacing
 				dataPriv.set( elem, "display", display );

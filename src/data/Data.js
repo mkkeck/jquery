@@ -1,8 +1,10 @@
 define( [
 	"../core",
 	"../var/rnotwhite",
-	"./var/acceptData"
-], function( jQuery, rnotwhite, acceptData ) {
+	"./var/acceptData",
+  "../var/domType",
+  "../var/undef"
+], function( jQuery, rnotwhite, acceptData, domType, undef ) {
 
 function Data() {
 	this.expando = jQuery.expando + Data.uid++;
@@ -18,7 +20,7 @@ Data.prototype = {
 
 		// If it is a node unlikely to be stringify-ed or looped over
 		// use plain assignment
-		if ( owner.nodeType ) {
+		if ( owner[ domType ] ) {
 			owner[ expando ] = value;
 
 		// Otherwise secure it in a non-enumerable, non-writable property
@@ -58,7 +60,7 @@ Data.prototype = {
 
 				// If it is a node unlikely to be stringify-ed or looped over
 				// use plain assignment
-				if ( owner.nodeType ) {
+				if ( owner[ domType ] ) {
 					owner[ expando ] = value;
 
 				// Otherwise secure it in a non-enumerable property
@@ -95,7 +97,7 @@ Data.prototype = {
 	},
 	get: function( owner, key ) {
 		var expando = this.expando;
-		return key === undefined ?
+		return key === undef ?
 			this.cache( owner ) :
 			owner[ expando ] && owner[ expando ][ key ];
 	},
@@ -113,12 +115,12 @@ Data.prototype = {
 		//   1. The entire cache object
 		//   2. The data stored at the key
 		//
-		if ( key === undefined ||
-				( ( key && typeof key === "string" ) && value === undefined ) ) {
+		if ( key === undef ||
+				( ( key && typeof key === "string" ) && value === undef ) ) {
 
 			stored = this.get( owner, key );
 
-			return stored !== undefined ?
+			return stored !== undef ?
 				stored : this.get( owner, jQuery.camelCase( key ) );
 		}
 
@@ -132,18 +134,18 @@ Data.prototype = {
 
 		// Since the "set" path can have two possible entry points
 		// return the expected data based on which path was taken[*]
-		return value !== undefined ? value : key;
+		return value !== undef ? value : key;
 	},
 	remove: function( owner, key ) {
 		var i, name, camel,
 			expando = this.expando,
 			cache = owner[ expando ];
 
-		if ( cache === undefined ) {
+		if ( cache === undef ) {
 			return;
 		}
 
-		if ( key === undefined ) {
+		if ( key === undef ) {
 			this.register( owner );
 
 		} else {
@@ -182,14 +184,14 @@ Data.prototype = {
 		}
 
 		// Remove the expando if there's no more data
-		if ( key === undefined || jQuery.isEmptyObject( cache ) ) {
+		if ( key === undef || jQuery.isEmptyObject( cache ) ) {
 
 			// Support: Chrome <= 35-45+
 			// Webkit & Blink performance suffers when deleting properties
 			// from DOM nodes, so set to undefined instead
 			// https://code.google.com/p/chromium/issues/detail?id=378607
-			if ( owner.nodeType ) {
-				owner[ expando ] = undefined;
+			if ( owner[ domType ] ) {
+				owner[ expando ] = undef;
 			} else {
 				delete owner[ expando ];
 			}
@@ -197,7 +199,7 @@ Data.prototype = {
 	},
 	hasData: function( owner ) {
 		var cache = owner[ this.expando ];
-		return cache !== undefined && !jQuery.isEmptyObject( cache );
+		return cache !== undef && !jQuery.isEmptyObject( cache );
 	}
 };
 

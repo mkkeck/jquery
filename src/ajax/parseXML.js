@@ -1,6 +1,8 @@
 define( [
-	"../core"
-], function( jQuery ) {
+	"../core",
+  "../var/getByTag",
+  "../var/undef"
+], function( jQuery, getByTag, undef ) {
 
 // Cross-browser xml parsing
 jQuery.parseXML = function( data ) {
@@ -13,10 +15,10 @@ jQuery.parseXML = function( data ) {
 	try {
 		xml = ( new window.DOMParser() ).parseFromString( data, "text/xml" );
 	} catch ( e ) {
-		xml = undefined;
+		xml = undef;
 	}
 
-	if ( !xml || xml.getElementsByTagName( "parsererror" ).length ) {
+	if ( !xml || xml[ getByTag ]( "parsererror" ).length ) {
 		jQuery.error( "Invalid XML: " + data );
 	}
 	return xml;

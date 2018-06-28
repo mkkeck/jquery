@@ -2,8 +2,14 @@ define( [
 	"./core",
 	"./core/access",
 	"./data/var/dataPriv",
-	"./data/var/dataUser"
-], function( jQuery, access, dataPriv, dataUser ) {
+	"./data/var/dataUser",
+	"./var/getAttr",
+	"./var/domType",
+	"./var/strlower",
+	"./var/undef"
+], function(
+	jQuery, access, dataPriv, dataUser, getAttr, domType, strlower, undef
+) {
 
 //	Implementation Summary
 //
@@ -23,9 +29,9 @@ function dataAttr( elem, key, data ) {
 
 	// If nothing was found internally, try to fetch any
 	// data from the HTML5 data-* attribute
-	if ( data === undefined && elem.nodeType === 1 ) {
-		name = "data-" + key.replace( rmultiDash, "-$&" ).toLowerCase();
-		data = elem.getAttribute( name );
+	if ( data === undef && elem[ domType ] === 1 ) {
+		name = "data-" + strlower( key.replace( rmultiDash, "-$&" ) );
+		data = elem[ getAttr ]( name );
 
 		if ( typeof data === "string" ) {
 			try {
@@ -42,7 +48,7 @@ function dataAttr( elem, key, data ) {
 			// Make sure we set the data so it isn't changed later
 			dataUser.set( elem, key, data );
 		} else {
-			data = undefined;
+			data = undef;
 		}
 	}
 	return data;
@@ -76,14 +82,15 @@ jQuery.fn.extend( {
 	data: function( key, value ) {
 		var i, name, data,
 			elem = this[ 0 ],
-			attrs = elem && elem.attributes;
+			attrs = elem && elem.attributes,
+			hasda = "hasDataAttrs";
 
 		// Gets all values
-		if ( key === undefined ) {
+		if ( key === undef ) {
 			if ( this.length ) {
 				data = dataUser.get( elem );
 
-				if ( elem.nodeType === 1 && !dataPriv.get( elem, "hasDataAttrs" ) ) {
+				if ( elem[ domType ] === 1 && !dataPriv.get( elem, hasda ) ) {
 					i = attrs.length;
 					while ( i-- ) {
 
@@ -97,7 +104,7 @@ jQuery.fn.extend( {
 							}
 						}
 					}
-					dataPriv.set( elem, "hasDataAttrs", true );
+					dataPriv.set( elem, hasda, true );
 				}
 			}
 
@@ -119,7 +126,7 @@ jQuery.fn.extend( {
 			// `value` parameter was not undefined. An empty jQuery object
 			// will result in `undefined` for elem = this[ 0 ] which will
 			// throw an exception if an attempt to read a data cache is made.
-			if ( elem && value === undefined ) {
+			if ( elem && value === undef ) {
 
 				// Attempt to get data from the cache
 				// with the key as-is
@@ -127,9 +134,9 @@ jQuery.fn.extend( {
 
 					// Try to find dashed key if it exists (gh-2779)
 					// This is for 2.2.x only
-					dataUser.get( elem, key.replace( rmultiDash, "-$&" ).toLowerCase() );
+					dataUser.get( elem, strlower( key.replace( rmultiDash, "-$&" ) ) );
 
-				if ( data !== undefined ) {
+				if ( data !== undef ) {
 					return data;
 				}
 
@@ -138,14 +145,14 @@ jQuery.fn.extend( {
 				// Attempt to get data from the cache
 				// with the key camelized
 				data = dataUser.get( elem, camelKey );
-				if ( data !== undefined ) {
+				if ( data !== undef ) {
 					return data;
 				}
 
 				// Attempt to "discover" the data in
 				// HTML5 custom data-* attrs
-				data = dataAttr( elem, camelKey, undefined );
-				if ( data !== undefined ) {
+				data = dataAttr( elem, camelKey, undef );
+				if ( data !== undef ) {
 					return data;
 				}
 
@@ -169,7 +176,7 @@ jQuery.fn.extend( {
 				// *... In the case of properties that might _actually_
 				// have dashes, we need to also store a copy of that
 				// unchanged property.
-				if ( key.indexOf( "-" ) > -1 && data !== undefined ) {
+				if ( key.indexOf( "-" ) > -1 && data !== undef ) {
 					dataUser.set( this, key, value );
 				}
 			} );

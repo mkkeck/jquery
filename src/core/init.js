@@ -3,8 +3,16 @@ define( [
 	"../core",
 	"../var/document",
 	"./var/rsingleTag",
+	"../var/getById",
+	"../var/getOwnDoc",
+	"../var/domType",
+	"../var/domParent",
+	"../var/undef",
 	"../traversing/findFilter"
-], function( jQuery, document, rsingleTag ) {
+], function(
+	jQuery, document, rsingleTag,
+	getById, getOwnDoc, domType, domParent, undef
+) {
 
 // A central reference to the root jQuery(document)
 var rootjQuery,
@@ -15,7 +23,7 @@ var rootjQuery,
 	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
 
 	init = jQuery.fn.init = function( selector, context, root ) {
-		var match, elem;
+		var match, elem, sel = "selector", ctx = "context";
 
 		// HANDLE: $(""), $(null), $(undefined), $(false)
 		if ( !selector ) {
@@ -50,7 +58,7 @@ var rootjQuery,
 					// Intentionally let the error be thrown if parseHTML is not present
 					jQuery.merge( this, jQuery.parseHTML(
 						match[ 1 ],
-						context && context.nodeType ? context.ownerDocument || context : document,
+						context && context[ domType ] ? context[ getOwnDoc ] || context : document,
 						true
 					) );
 
@@ -73,19 +81,19 @@ var rootjQuery,
 
 				// HANDLE: $(#id)
 				} else {
-					elem = document.getElementById( match[ 2 ] );
+					elem = document[ getById ]( match[ 2 ] );
 
 					// Support: Blackberry 4.6
 					// gEBID returns nodes no longer in the document (#6963)
-					if ( elem && elem.parentNode ) {
+					if ( elem && elem[ domParent ] ) {
 
 						// Inject the element directly into the jQuery object
 						this.length = 1;
 						this[ 0 ] = elem;
 					}
 
-					this.context = document;
-					this.selector = selector;
+					this[ ctx ] = document;
+					this[ sel ] = selector;
 					return this;
 				}
 
@@ -100,24 +108,24 @@ var rootjQuery,
 			}
 
 		// HANDLE: $(DOMElement)
-		} else if ( selector.nodeType ) {
-			this.context = this[ 0 ] = selector;
+		} else if ( selector[ domType ] ) {
+			this[ ctx ] = this[ 0 ] = selector;
 			this.length = 1;
 			return this;
 
 		// HANDLE: $(function)
 		// Shortcut for document ready
 		} else if ( jQuery.isFunction( selector ) ) {
-			return root.ready !== undefined ?
+			return root.ready !== undef ?
 				root.ready( selector ) :
 
 				// Execute immediately if ready is not present
 				selector( jQuery );
 		}
 
-		if ( selector.selector !== undefined ) {
-			this.selector = selector.selector;
-			this.context = selector.context;
+		if ( selector[ sel ] !== undef ) {
+			this[ sel ] = selector[ sel ];
+			this[ ctx ] = selector[ ctx ];
 		}
 
 		return jQuery.makeArray( selector, this );

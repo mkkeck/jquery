@@ -1,8 +1,9 @@
 define( [
 	"../core",
 	"../var/document",
+	"../var/undef",
 	"../ajax"
-], function( jQuery, document ) {
+], function( jQuery, document, undef ) {
 
 // Install script dataType
 jQuery.ajaxSetup( {
@@ -23,7 +24,7 @@ jQuery.ajaxSetup( {
 
 // Handle cache's special case and crossDomain
 jQuery.ajaxPrefilter( "script", function( s ) {
-	if ( s.cache === undefined ) {
+	if ( s.cache === undef ) {
 		s.cache = false;
 	}
 	if ( s.crossDomain ) {

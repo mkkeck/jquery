@@ -1,7 +1,6 @@
 define( [
 	"./core"
 ], function( jQuery ) {
-
 jQuery.fn.extend( {
 
 	bind: function( types, data, fn ) {
@@ -29,4 +28,3 @@ jQuery.fn.extend( {
 jQuery.fn.andSelf = jQuery.fn.addBack;
 
 } );
-

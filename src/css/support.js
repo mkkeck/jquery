@@ -2,13 +2,14 @@ define( [
 	"../core",
 	"../var/document",
 	"../var/documentElement",
+	"../var/createElem",
 	"../var/support"
-], function( jQuery, document, documentElement, support ) {
+], function( jQuery, document, documentElement, createElem, support ) {
 
 ( function() {
 	var pixelPositionVal, boxSizingReliableVal, pixelMarginRightVal, reliableMarginLeftVal,
-		container = document.createElement( "div" ),
-		div = document.createElement( "div" );
+		container = createElem( "div", document ),
+		div = createElem( "div", document );
 
 	// Finish early in limited (non-browser) environments
 	if ( !div.style ) {
@@ -32,7 +33,8 @@ define( [
 
 			// Support: Firefox<29, Android 2.3
 			// Vendor-prefix box-sizing
-			"-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;" +
+			//"-webkit-box-sizing:border-box;-moz-box-sizing:border-box;" +
+			"box-sizing:border-box;" +
 			"position:relative;display:block;" +
 			"margin:auto;border:1px;padding:1px;" +
 			"top:1%;width:50%";
@@ -84,7 +86,9 @@ define( [
 				computeStyleTests();
 			}
 			return reliableMarginLeftVal;
+/*
 		},
+
 		reliableMarginRight: function() {
 
 			// Support: Android 2.3
@@ -100,7 +104,8 @@ define( [
 
 				// Support: Android 2.3
 				// Vendor-prefix box-sizing
-				"-webkit-box-sizing:content-box;box-sizing:content-box;" +
+				//"-webkit-box-sizing:content-box;"
+				"box-sizing:content-box;" +
 				"display:block;margin:0;border:0;padding:0";
 			marginDiv.style.marginRight = marginDiv.style.width = "0";
 			div.style.width = "1px";
@@ -112,6 +117,7 @@ define( [
 			div.removeChild( marginDiv );
 
 			return ret;
+*/
 		}
 	} );
 } )();

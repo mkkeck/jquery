@@ -1,18 +1,22 @@
 define( [
 	"./core",
 	"./var/slice",
+
 	"./callbacks"
 ], function( jQuery, slice ) {
 
 jQuery.extend( {
 
 	Deferred: function( func ) {
-		var tuples = [
+		var
+			cb = "Callbacks", m = "memory", om = "once " + m,
+			rj = "reject", rs = "resolve",
+			tuples = [
 
 				// action, add listener, listener list, final state
-				[ "resolve", "done", jQuery.Callbacks( "once memory" ), "resolved" ],
-				[ "reject", "fail", jQuery.Callbacks( "once memory" ), "rejected" ],
-				[ "notify", "progress", jQuery.Callbacks( "memory" ) ]
+				[ rs, "done", jQuery[ cb ]( om ), rs + "d" ],
+				[ rj, "fail", jQuery[ cb ]( om ), rj + "ed" ],
+				[ "notify", "progress", jQuery[ cb ]( m ) ]
 			],
 			state = "pending",
 			promise = {
@@ -20,13 +24,14 @@ jQuery.extend( {
 					return state;
 				},
 				always: function() {
-					deferred.done( arguments ).fail( arguments );
+					var args = arguments;
+					deferred.done( args ).fail( args );
 					return this;
 				},
 				then: function( /* fnDone, fnFail, fnProgress */ ) {
 					var fns = arguments;
 					return jQuery.Deferred( function( newDefer ) {
-						jQuery.each( tuples, function( i, tuple ) {
+						tuples.forEach( function( tuple, i ) {
 							var fn = jQuery.isFunction( fns[ i ] ) && fns[ i ];
 
 							// deferred[ done | fail | progress ] for forwarding actions to newDefer
@@ -35,8 +40,8 @@ jQuery.extend( {
 								if ( returned && jQuery.isFunction( returned.promise ) ) {
 									returned.promise()
 										.progress( newDefer.notify )
-										.done( newDefer.resolve )
-										.fail( newDefer.reject );
+										.done( newDefer[ rs ] )
+										.fail( newDefer[ rj ] );
 								} else {
 									newDefer[ tuple[ 0 ] + "With" ](
 										this === promise ? newDefer.promise() : this,
@@ -61,7 +66,7 @@ jQuery.extend( {
 		promise.pipe = promise.then;
 
 		// Add list-specific methods
-		jQuery.each( tuples, function( i, tuple ) {
+		tuples.forEach( function( tuple, i ) {
 			var list = tuple[ 2 ],
 				stateString = tuple[ 3 ];
 
@@ -116,8 +121,9 @@ jQuery.extend( {
 			// Update function for both resolve and progress values
 			updateFunc = function( i, contexts, values ) {
 				return function( value ) {
+					var args = arguments;
 					contexts[ i ] = this;
-					values[ i ] = arguments.length > 1 ? slice.call( arguments ) : value;
+					values[ i ] = args.length > 1 ? slice.call( args ) : value;
 					if ( values === progressValues ) {
 						deferred.notifyWith( contexts, values );
 					} else if ( !( --remaining ) ) {

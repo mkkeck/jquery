@@ -8,8 +8,17 @@ define( [
 	"./var/class2type",
 	"./var/toString",
 	"./var/hasOwn",
-	"./var/support"
-], function( arr, document, slice, concat, push, indexOf, class2type, toString, hasOwn, support ) {
+	"./var/support",
+	"./var/createElem",
+	"./var/strlower",
+  "./var/domNode",
+  "./var/domType",
+  "./var/domParent",
+  "./var/undef"
+], function(
+	arr, document, slice, concat, push, indexOf, class2type, toString, hasOwn,
+	support, createElem, strlower, domNode, domType, domParent, undef
+) {
 
 var
 	version = "@VERSION",
@@ -55,13 +64,14 @@ jQuery.fn = jQuery.prototype = {
 	// Get the Nth element in the matched element set OR
 	// Get the whole matched element set as a clean array
 	get: function( num ) {
+	  var t = this;
 		return num != null ?
 
 			// Return just the one element from the set
-			( num < 0 ? this[ num + this.length ] : this[ num ] ) :
+			( num < 0 ? t[ num + t.length ] : t[ num ] ) :
 
 			// Return all the elements in a clean array
-			slice.call( this );
+			slice.call( t );
 	},
 
 	// Take an array of elements and push it onto the stack
@@ -121,9 +131,10 @@ jQuery.fn = jQuery.prototype = {
 
 jQuery.extend = jQuery.fn.extend = function() {
 	var options, name, src, copy, copyIsArray, clone,
-		target = arguments[ 0 ] || {},
+		args = arguments,
+		target = args[ 0 ] || {},
 		i = 1,
-		length = arguments.length,
+		length = args.length,
 		deep = false;
 
 	// Handle a deep copy situation
@@ -131,7 +142,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 		deep = target;
 
 		// Skip the boolean and the target
-		target = arguments[ i ] || {};
+		target = args[ i ] || {};
 		i++;
 	}
 
@@ -149,7 +160,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 	for ( ; i < length; i++ ) {
 
 		// Only deal with non-null/undefined values
-		if ( ( options = arguments[ i ] ) != null ) {
+		if ( ( options = args[ i ] ) != null ) {
 
 			// Extend the base object
 			for ( name in options ) {
@@ -177,7 +188,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 					target[ name ] = jQuery.extend( deep, clone, copy );
 
 				// Don't bring in undefined values
-				} else if ( copy !== undefined ) {
+				} else if ( copy !== undef ) {
 					target[ name ] = copy;
 				}
 			}
@@ -223,20 +234,20 @@ jQuery.extend( {
 	},
 
 	isPlainObject: function( obj ) {
-		var key;
+		var key, con = "constructor";
 
 		// Not plain objects:
 		// - Any object or value whose internal [[Class]] property is not "[object Object]"
 		// - DOM nodes
 		// - window
-		if ( jQuery.type( obj ) !== "object" || obj.nodeType || jQuery.isWindow( obj ) ) {
+		if ( jQuery.type( obj ) !== "object" || obj[ domType ] || jQuery.isWindow( obj ) ) {
 			return false;
 		}
 
 		// Not own constructor property must be Object
-		if ( obj.constructor &&
-				!hasOwn.call( obj, "constructor" ) &&
-				!hasOwn.call( obj.constructor.prototype || {}, "isPrototypeOf" ) ) {
+		if ( obj[ con ] &&
+				!hasOwn.call( obj, con ) &&
+				!hasOwn.call( obj[ con ].prototype || {}, "isPrototypeOf" ) ) {
 			return false;
 		}
 
@@ -244,7 +255,7 @@ jQuery.extend( {
 		// if last one is own, then all properties are own
 		for ( key in obj ) {}
 
-		return key === undefined || hasOwn.call( obj, key );
+		return key === undef || hasOwn.call( obj, key );
 	},
 
 	isEmptyObject: function( obj ) {
@@ -261,7 +272,7 @@ jQuery.extend( {
 		}
 
 		// Support: Android<4.0, iOS<6 (functionish RegExp)
-		return typeof obj === "object" || typeof obj === "function" ?
+		return /^obj|fun/.test( typeof obj ) ?
 			class2type[ toString.call( obj ) ] || "object" :
 			typeof obj;
 	},
@@ -279,9 +290,9 @@ jQuery.extend( {
 			// strict mode pragma, execute code by injecting a
 			// script tag into the document.
 			if ( code.indexOf( "use strict" ) === 1 ) {
-				script = document.createElement( "script" );
+				script = createElem( "script", document );
 				script.text = code;
-				document.head.appendChild( script ).parentNode.removeChild( script );
+				document.head.appendChild( script )[ domParent ].removeChild( script );
 			} else {
 
 				// Otherwise, avoid the DOM node creation, insertion
@@ -300,7 +311,8 @@ jQuery.extend( {
 	},
 
 	nodeName: function( elem, name ) {
-		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+		var n = elem[ domNode ] || null;
+	  return n && strlower( n ) === strlower( name );
 	},
 
 	each: function( obj, callback ) {
@@ -435,7 +447,7 @@ jQuery.extend( {
 		// Quick check to determine if target is callable, in the spec
 		// this throws a TypeError, but we will just return undefined.
 		if ( !jQuery.isFunction( fn ) ) {
-			return undefined;
+			return undef;
 		}
 
 		// Simulated bind
@@ -468,9 +480,9 @@ if ( typeof Symbol === "function" ) {
 /* jshint ignore: end */
 
 // Populate the class2type map
-jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symbol".split( " " ),
-function( i, name ) {
-	class2type[ "[object " + name + "]" ] = name.toLowerCase();
+( "Boolean Number String Function Array Date RegExp Object Error Symbol" ).split( " " ).forEach(
+function( name ) {
+	class2type[ "[object " + name + "]" ] = strlower( name );
 } );
 
 function isArrayLike( obj ) {

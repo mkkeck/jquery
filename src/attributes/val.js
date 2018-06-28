@@ -1,8 +1,15 @@
 define( [
 	"../core",
 	"./support",
+	"../var/strlower",
+	"../var/getAttr",
+	"../var/domNode",
+	"../var/domType",
+	"../var/domParent",
+	"../var/undef",
+
 	"../core/init"
-], function( jQuery, support ) {
+], function( jQuery, support, strlower, getAttr, domNode, domType, domParent, undef ) {
 
 var rreturn = /\r/g,
 	rspaces = /[\x20\t\r\n\f]+/g;
@@ -16,11 +23,11 @@ jQuery.fn.extend( {
 		if ( !arguments.length ) {
 			if ( elem ) {
 				hooks = valHooks[ elem.type ] ||
-					valHooks[ elem.nodeName.toLowerCase() ];
+					valHooks[ strlower( elem[ domNode ] ) ];
 
 				if ( hooks &&
 					"get" in hooks &&
-					( ret = hooks.get( elem, "value" ) ) !== undefined
+					( ret = hooks.get( elem, "value" ) ) !== undef
 				) {
 					return ret;
 				}
@@ -44,7 +51,7 @@ jQuery.fn.extend( {
 		return this.each( function( i ) {
 			var val, valHooks = jQuery.valHooks;
 
-			if ( this.nodeType !== 1 ) {
+			if ( this[ domType ] !== 1 ) {
 				return;
 			}
 
@@ -67,10 +74,10 @@ jQuery.fn.extend( {
 				} );
 			}
 
-			hooks = valHooks[ this.type ] || valHooks[ this.nodeName.toLowerCase() ];
+			hooks = valHooks[ this.type ] || valHooks[ strlower( this[ domNode ] ) ];
 
 			// If set returns undefined, fall back to normal setting
-			if ( !hooks || !( "set" in hooks ) || hooks.set( this, val, "value" ) === undefined ) {
+			if ( !hooks || !( "set" in hooks ) || hooks.set( this, val, "value" ) === undef ) {
 				this.value = val;
 			}
 		} );
@@ -114,9 +121,9 @@ jQuery.extend( {
 
 							// Don't return options that are disabled or in a disabled optgroup
 							( support.optDisabled ?
-								!option.disabled : option.getAttribute( "disabled" ) === null ) &&
-							( !option.parentNode.disabled ||
-								!jQuery.nodeName( option.parentNode, "optgroup" ) ) ) {
+								!option.disabled : option[ getAttr ]( "disabled" ) === null ) &&
+							( !option[ domParent ].disabled ||
+								!jQuery[ domNode ]( option[ domParent ], "optgroup" ) ) ) {
 
 						// Get the specific value for the option
 						value = jQuery( option ).val();
@@ -170,7 +177,7 @@ jQuery.extend( {
 	};
 	if ( !support.checkOn ) {
 		valHooks.get = function( elem ) {
-			return elem.getAttribute( "value" ) === null ? "on" : elem.value;
+			return elem[ getAttr ]( "value" ) === null ? "on" : elem.value;
 		};
 	}
 } );

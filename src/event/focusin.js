@@ -1,11 +1,14 @@
 define( [
 	"../core",
+	"../var/getOwnDoc",
+	"../var/evtListenerAdd",
+	"../var/evtListenerRemove",
 	"../data/var/dataPriv",
 	"./support",
 
 	"../event",
 	"./trigger"
-], function( jQuery, dataPriv, support ) {
+], function( jQuery, getOwnDoc, evtListenerAdd, evtListenerRemove, dataPriv, support ) {
 
 // Support: Firefox
 // Firefox doesn't have focus(in | out) events
@@ -25,20 +28,20 @@ if ( !support.focusin ) {
 
 		jQuery.event.special[ fix ] = {
 			setup: function() {
-				var doc = this.ownerDocument || this,
+				var doc = this[ getOwnDoc ] || this,
 					attaches = dataPriv.access( doc, fix );
 
 				if ( !attaches ) {
-					doc.addEventListener( orig, handler, true );
+					doc[ evtListenerAdd ]( orig, handler, true );
 				}
 				dataPriv.access( doc, fix, ( attaches || 0 ) + 1 );
 			},
 			teardown: function() {
-				var doc = this.ownerDocument || this,
+				var doc = this[ getOwnDoc ] || this,
 					attaches = dataPriv.access( doc, fix ) - 1;
 
 				if ( !attaches ) {
-					doc.removeEventListener( orig, handler, true );
+					doc[ evtListenerRemove ]( orig, handler, true );
 					dataPriv.remove( doc, fix );
 
 				} else {

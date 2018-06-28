@@ -1,8 +1,11 @@
 define( [
 	"../core",
 	"../var/document",
+	"../var/getDocElem",
+	"../var/createElem",
+
 	"../manipulation" // appendTo
-], function( jQuery, document ) {
+], function( jQuery, document, getDocElem, createElem ) {
 
 var iframe,
 	elemdisplay = {
@@ -21,7 +24,7 @@ var iframe,
 
 // Called only from within defaultDisplay
 function actualDisplay( name, doc ) {
-	var elem = jQuery( doc.createElement( name ) ).appendTo( doc.body ),
+	var elem = jQuery( createElem( name, doc ) ).appendTo( doc.body ),
 
 		display = jQuery.css( elem[ 0 ], "display" );
 
@@ -48,7 +51,7 @@ function defaultDisplay( nodeName ) {
 
 			// Use the already-created iframe if possible
 			iframe = ( iframe || jQuery( "<iframe frameborder='0' width='0' height='0'/>" ) )
-				.appendTo( doc.documentElement );
+				.appendTo( doc[ getDocElem ] );
 
 			// Always write a new HTML skeleton so Webkit and Firefox don't choke on reuse
 			doc = iframe[ 0 ].contentDocument;

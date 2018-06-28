@@ -2,9 +2,14 @@ define( [
 	"./core",
 	"./var/document",
 	"./var/documentElement",
+	"./var/getDocElem",
 	"./var/hasOwn",
-	"./var/indexOf"
-], function( jQuery, document, documentElement, hasOwn, indexOf ) {
+	"./var/indexOf",
+  "./var/domType",
+  "./var/undef"
+], function(
+	jQuery, document, documentElement, getDocElem, hasOwn, indexOf, domType, undef
+) {
 
 /*
  * Optional (non-Sizzle) selector module for custom builds.
@@ -124,7 +129,7 @@ jQuery.extend( {
 		}
 
 		// Early return if context is not an element or document
-		if ( ( nodeType = context.nodeType ) !== 1 && nodeType !== 9 ) {
+		if ( ( nodeType = context[ domType ] ) !== 1 && nodeType !== 9 ) {
 			return [];
 		}
 
@@ -146,7 +151,7 @@ jQuery.extend( {
 		var node,
 			ret = "",
 			i = 0,
-			nodeType = elem.nodeType;
+			nodeType = elem[ domType ];
 
 		if ( !nodeType ) {
 
@@ -169,15 +174,15 @@ jQuery.extend( {
 		return ret;
 	},
 	contains: function( a, b ) {
-		var adown = a.nodeType === 9 ? a.documentElement : a,
+		var adown = a[ domType ] === 9 ? a[ getDocElem ] : a,
 			bup = b && b.parentNode;
-		return a === bup || !!( bup && bup.nodeType === 1 && adown.contains( bup ) );
+		return a === bup || !!( bup && bup[ domType ] === 1 && adown.contains( bup ) );
 	},
 	isXMLDoc: function( elem ) {
 
 		// documentElement is verified for cases where it doesn't yet exist
 		// (such as loading iframes in IE - #4833)
-		var documentElement = elem && ( elem.ownerDocument || elem ).documentElement;
+		var documentElement = elem && ( elem.ownerDocument || elem )[ getDocElem ];
 		return documentElement ? documentElement.nodeName !== "HTML" : false;
 	},
 	expr: {
@@ -202,9 +207,8 @@ jQuery.extend( jQuery.find, {
 
 			// Don't get fooled by Object.prototype properties (jQuery #13807)
 			value = fn && hasOwn.call( jQuery.expr.attrHandle, name.toLowerCase() ) ?
-				fn( elem, name, jQuery.isXMLDoc( elem ) ) :
-				undefined;
-		return value !== undefined ? value : elem.getAttribute( name );
+				fn( elem, name, jQuery.isXMLDoc( elem ) ) : undef;
+		return value !== undef ? value : elem.getAttribute( name );
 	}
 } );
 

@@ -3,8 +3,18 @@ define( [
 	"../core/access",
 	"./support",
 	"../var/rnotwhite",
+	"../var/strlower",
+	"../var/getAttr",
+	"../var/setAttr",
+	"../var/domNode",
+	"../var/domType",
+	"../var/undef",
+
 	"../selector"
-], function( jQuery, access, support, rnotwhite ) {
+], function(
+	jQuery, access, support, rnotwhite,
+	strlower, getAttr, setAttr, domNode, domType, undef
+) {
 
 var boolHook,
 	attrHandle = jQuery.expr.attrHandle;
@@ -24,7 +34,7 @@ jQuery.fn.extend( {
 jQuery.extend( {
 	attr: function( elem, name, value ) {
 		var ret, hooks,
-			nType = elem.nodeType;
+			nType = elem[ domType ];
 
 		// Don't get/set attributes on text, comment and attribute nodes
 		if ( nType === 3 || nType === 8 || nType === 2 ) {
@@ -32,30 +42,30 @@ jQuery.extend( {
 		}
 
 		// Fallback to prop when attributes are not supported
-		if ( typeof elem.getAttribute === "undefined" ) {
+		if ( typeof elem[ getAttr ] === "undefined" ) {
 			return jQuery.prop( elem, name, value );
 		}
 
 		// All attributes are lowercase
 		// Grab necessary hook if one is defined
 		if ( nType !== 1 || !jQuery.isXMLDoc( elem ) ) {
-			name = name.toLowerCase();
+			name = strlower( name );
 			hooks = jQuery.attrHooks[ name ] ||
-				( jQuery.expr.match.bool.test( name ) ? boolHook : undefined );
+				( jQuery.expr.match.bool.test( name ) ? boolHook : undef );
 		}
 
-		if ( value !== undefined ) {
+		if ( value !== undef ) {
 			if ( value === null ) {
 				jQuery.removeAttr( elem, name );
 				return;
 			}
 
 			if ( hooks && "set" in hooks &&
-				( ret = hooks.set( elem, value, name ) ) !== undefined ) {
+				( ret = hooks.set( elem, value, name ) ) !== undef ) {
 				return ret;
 			}
 
-			elem.setAttribute( name, value + "" );
+			elem[ setAttr ]( name, value + "" );
 			return value;
 		}
 
@@ -66,16 +76,16 @@ jQuery.extend( {
 		ret = jQuery.find.attr( elem, name );
 
 		// Non-existent attributes return null, we normalize to undefined
-		return ret == null ? undefined : ret;
+		return ret == null ? undef : ret;
 	},
 
 	attrHooks: {
 		type: {
 			set: function( elem, value ) {
 				if ( !support.radioValue && value === "radio" &&
-					jQuery.nodeName( elem, "input" ) ) {
+					jQuery[ domNode ]( elem, "input" ) ) {
 					var val = elem.value;
-					elem.setAttribute( "type", value );
+					elem[ setAttr ]( "type", value );
 					if ( val ) {
 						elem.value = val;
 					}
@@ -90,7 +100,7 @@ jQuery.extend( {
 			i = 0,
 			attrNames = value && value.match( rnotwhite );
 
-		if ( attrNames && elem.nodeType === 1 ) {
+		if ( attrNames && elem[ domType ] === 1 ) {
 			while ( ( name = attrNames[ i++ ] ) ) {
 				propName = jQuery.propFix[ name ] || name;
 
@@ -115,7 +125,7 @@ boolHook = {
 			// Remove boolean attributes when set to false
 			jQuery.removeAttr( elem, name );
 		} else {
-			elem.setAttribute( name, name );
+			elem[ setAttr ]( name, name );
 		}
 		return name;
 	}
@@ -131,7 +141,7 @@ jQuery.each( jQuery.expr.match.bool.source.match( /\w+/g ), function( i, name ) 
 			handle = attrHandle[ name ];
 			attrHandle[ name ] = ret;
 			ret = getter( elem, name, isXML ) != null ?
-				name.toLowerCase() :
+				strlower( name ) :
 				null;
 			attrHandle[ name ] = handle;
 		}

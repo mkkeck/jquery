@@ -2,9 +2,17 @@ define( [
 	"../core",
 	"../core/access",
 	"../var/rinputs",
+	"../var/strlower",
+	"../var/domNode",
+	"../var/domType",
+	"../var/domParent",
+	"../var/undef",
 	"./support",
+
 	"../selector"
-], function( jQuery, access, rinputs, support ) {
+], function(
+	jQuery, access, rinputs, strlower, domNode, domType, domParent, undef, support
+) {
 
 var rclickable = /^(?:a|area)$/i;
 
@@ -23,7 +31,7 @@ jQuery.fn.extend( {
 jQuery.extend( {
 	prop: function( elem, name, value ) {
 		var ret, hooks,
-			nType = elem.nodeType;
+			nType = elem[ domType ];
 
 		// Don't get/set properties on text, comment and attribute nodes
 		if ( nType === 3 || nType === 8 || nType === 2 ) {
@@ -37,9 +45,9 @@ jQuery.extend( {
 			hooks = jQuery.propHooks[ name ];
 		}
 
-		if ( value !== undefined ) {
+		if ( value !== undef ) {
 			if ( hooks && "set" in hooks &&
-				( ret = hooks.set( elem, value, name ) ) !== undefined ) {
+				( ret = hooks.set( elem, value, name ) ) !== undef ) {
 				return ret;
 			}
 
@@ -65,8 +73,8 @@ jQuery.extend( {
 
 				return tabindex ?
 					parseInt( tabindex, 10 ) :
-					rinputs.test( elem.nodeName ) ||
-						rclickable.test( elem.nodeName ) && elem.href ?
+					rinputs.test( elem[ domNode ] ) ||
+						rclickable.test( elem[ domNode ] ) && elem.href ?
 							0 :
 							-1;
 			}
@@ -88,18 +96,18 @@ jQuery.extend( {
 if ( !support.optSelected ) {
 	jQuery.propHooks.selected = {
 		get: function( elem ) {
-			var parent = elem.parentNode, grandpa;
-			if ( parent && ( grandpa = parent.parentNode ) ) {
+			var parent = elem[ domParent ], grandpa;
+			if ( parent && ( grandpa = parent[ domParent ] ) ) {
 				grandpa.selectedIndex;
 			}
 			return null;
 		},
 		set: function( elem ) {
-			var parent = elem.parentNode, grandpa;
+			var parent = elem[ domParent ], grandpa;
 			if ( parent ) {
 				parent.selectedIndex;
 
-				if ( grandpa = parent.parentNode ) {
+				if ( grandpa = parent[ domParent ] ) {
 					grandpa.selectedIndex;
 				}
 			}
@@ -111,7 +119,7 @@ if ( !support.optSelected ) {
 	"tabIndex readOnly maxLength cellSpacing cellPadding " +
 	"rowSpan colSpan useMap frameBorder contentEditable"
 ).split( " " ).forEach( function( item ) {
-	jQuery.propFix[ item.toLowerCase() ] = item;
+	jQuery.propFix[ strlower( item ) ] = item;
 } );
 
 } );

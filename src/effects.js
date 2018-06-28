@@ -8,6 +8,9 @@ define( [
 	"./css/adjustCSS",
 	"./css/defaultDisplay",
 	"./data/var/dataPriv",
+	"./var/domNode",
+	"./var/domType",
+	"./var/undef",
 
 	"./core/init",
 	"./effects/Tween",
@@ -16,8 +19,7 @@ define( [
 	"./deferred",
 	"./traversing"
 ], function( jQuery, document, rcssNum, cssExpand, rnotwhite,
-	isHidden, adjustCSS, defaultDisplay, dataPriv ) {
-
+	isHidden, adjustCSS, defaultDisplay, dataPriv, domNode, domType, undef ) {
 var
 	fxNow, timerId,
 	rfxtypes = /^(?:toggle|show|hide)$/,
@@ -26,7 +28,7 @@ var
 // Animations created synchronously will run synchronously
 function createFxNow() {
 	window.setTimeout( function() {
-		fxNow = undefined;
+		fxNow = undef;
 	} );
 	return ( fxNow = jQuery.now() );
 }
@@ -69,11 +71,12 @@ function createTween( value, prop, animation ) {
 
 function defaultPrefilter( elem, props, opts ) {
 	/* jshint validthis: true */
-	var prop, value, toggle, tween, hooks, oldfire, display, checkDisplay,
+	var prop, value, toggle, tween, hooks, oldfire, display, checkDisplay, tmp,
 		anim = this,
+		ovfl = "overflow", ovflX = ovfl + "X", ovflY = ovfl + "Y",
 		orig = {},
 		style = elem.style,
-		hidden = elem.nodeType && isHidden( elem ),
+		hidden = elem[ domType ] && isHidden( elem ),
 		dataShow = dataPriv.get( elem, "fxshow" );
 
 	// Handle queue: false promises
@@ -103,13 +106,13 @@ function defaultPrefilter( elem, props, opts ) {
 	}
 
 	// Height/width overflow pass
-	if ( elem.nodeType === 1 && ( "height" in props || "width" in props ) ) {
+	if ( elem[ domType ] === 1 && ( "height" in props || "width" in props ) ) {
 
 		// Make sure that nothing sneaks out
 		// Record all 3 overflow attributes because IE9-10 do not
 		// change the overflow attribute when overflowX and
 		// overflowY are set to the same value
-		opts.overflow = [ style.overflow, style.overflowX, style.overflowY ];
+		opts[ ovfl ] = [ style[ ovfl ], style[ ovflX ], style[ ovflY ] ];
 
 		// Set display property to inline-block for height/width
 		// animations on inline elements that are having width/height animated
@@ -117,19 +120,19 @@ function defaultPrefilter( elem, props, opts ) {
 
 		// Test default display if display is currently "none"
 		checkDisplay = display === "none" ?
-			dataPriv.get( elem, "olddisplay" ) || defaultDisplay( elem.nodeName ) : display;
+			dataPriv.get( elem, "olddisplay" ) || defaultDisplay( elem[ domNode ] ) : display;
 
 		if ( checkDisplay === "inline" && jQuery.css( elem, "float" ) === "none" ) {
 			style.display = "inline-block";
 		}
 	}
 
-	if ( opts.overflow ) {
-		style.overflow = "hidden";
+	if ( tmp = opts[ ovfl ] ) {
+		style[ ovfl ] = "hidden";
 		anim.always( function() {
-			style.overflow = opts.overflow[ 0 ];
-			style.overflowX = opts.overflow[ 1 ];
-			style.overflowY = opts.overflow[ 2 ];
+			style[ ovfl ] = tmp[ 0 ];
+			style[ ovflX ] = tmp[ 1 ];
+			style[ ovflY ] = tmp[ 2 ];
 		} );
 	}
 
@@ -143,7 +146,7 @@ function defaultPrefilter( elem, props, opts ) {
 
 				// If there is dataShow left over from a stopped hide or show
 				// and we are going to proceed with show, we should pretend to be hidden
-				if ( value === "show" && dataShow && dataShow[ prop ] !== undefined ) {
+				if ( value === "show" && dataShow && dataShow[ prop ] !== undef ) {
 					hidden = true;
 				} else {
 					continue;
@@ -153,7 +156,7 @@ function defaultPrefilter( elem, props, opts ) {
 
 		// Any non-fx value stops us from restoring the original display value
 		} else {
-			display = undefined;
+			display = undef;
 		}
 	}
 
@@ -198,7 +201,9 @@ function defaultPrefilter( elem, props, opts ) {
 		}
 
 	// If this is a noop like .hide().hide(), restore an overwritten display value
-	} else if ( ( display === "none" ? defaultDisplay( elem.nodeName ) : display ) === "inline" ) {
+	} else if (
+		( display === "none" ? defaultDisplay( elem[ domNode ] ) : display ) === "inline"
+	) {
 		style.display = display;
 	}
 }
@@ -471,7 +476,7 @@ jQuery.fn.extend( {
 		if ( typeof type !== "string" ) {
 			gotoEnd = clearQueue;
 			clearQueue = type;
-			type = undefined;
+			type = undef;
 		}
 		if ( clearQueue && type !== false ) {
 			this.queue( type || "fx", [] );
@@ -556,7 +561,7 @@ jQuery.fn.extend( {
 	}
 } );
 
-jQuery.each( [ "toggle", "show", "hide" ], function( i, name ) {
+[ "toggle", "show", "hide" ].forEach( function( name ) {
 	var cssFn = jQuery.fn[ name ];
 	jQuery.fn[ name ] = function( speed, easing, callback ) {
 		return speed == null || typeof speed === "boolean" ?
@@ -599,7 +604,7 @@ jQuery.fx.tick = function() {
 	if ( !timers.length ) {
 		jQuery.fx.stop();
 	}
-	fxNow = undefined;
+	fxNow = undef;
 };
 
 jQuery.fx.timer = function( timer ) {

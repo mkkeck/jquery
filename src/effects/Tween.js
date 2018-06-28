@@ -1,7 +1,10 @@
 define( [
 	"../core",
+	"../var/domType",
+	"../var/domParent",
+
 	"../css"
-], function( jQuery ) {
+], function( jQuery, domType, domParent ) {
 
 function Tween( elem, options, prop, end, easing ) {
 	return new Tween.prototype.init( elem, options, prop, end, easing );
@@ -29,14 +32,14 @@ Tween.prototype = {
 			propHooks._default.get( this );
 	},
 	run: function( percent ) {
-		var eased,
+		var eased, dur,
 			propHooks = Tween.propHooks,
 			options = this.options,
 			hooks = propHooks[ this.prop ];
 
-		if ( options.duration ) {
+		if ( dur = options.duration ) {
 			this.pos = eased = jQuery.easing[ this.easing ](
-				percent, options.duration * percent, 0, 1, options.duration
+				percent, dur * percent, 0, 1, dur
 			);
 		} else {
 			this.pos = eased = percent;
@@ -66,7 +69,7 @@ Tween.propHooks = {
 
 			// Use a property on the element directly when it is not a DOM element,
 			// or when there is no matching style property that exists.
-			if ( elem.nodeType !== 1 ||
+			if ( elem[ domType ] !== 1 ||
 				elem[ tween.prop ] != null && elem.style[ tween.prop ] == null ) {
 				return elem[ tween.prop ];
 			}
@@ -89,7 +92,7 @@ Tween.propHooks = {
 			// Use .style if available and use plain properties where available.
 			if ( fx.step[ tween.prop ] ) {
 				fx.step[ tween.prop ]( tween );
-			} else if ( elem.nodeType === 1 &&
+			} else if ( elem[ domType ] === 1 &&
 				( elem.style[ jQuery.cssProps[ tween.prop ] ] != null ||
 					jQuery.cssHooks[ tween.prop ] ) ) {
 				jQuery.style( elem, tween.prop, tween.now + tween.unit );
@@ -105,7 +108,7 @@ Tween.propHooks = {
 Tween.propHooks.scrollTop = Tween.propHooks.scrollLeft = {
 	set: function( tween ) {
 		var elem = tween.elem;
-		if ( elem.nodeType && elem.parentNode ) {
+		if ( elem[ domType ] && elem[ domParent ] ) {
 			elem[ tween.prop ] = tween.now;
 		}
 	}

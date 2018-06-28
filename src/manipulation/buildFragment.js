@@ -1,11 +1,17 @@
 define( [
 	"../core",
+	"../var/createElem",
+	"../var/getOwnDoc",
+	"../var/domType",
 	"./var/rtagName",
 	"./var/rscriptType",
 	"./wrapMap",
 	"./getAll",
 	"./setGlobalEval"
-], function( jQuery, rtagName, rscriptType, wrapMap, getAll, setGlobalEval ) {
+], function(
+	jQuery, createElem, getOwnDoc, domType,
+	rtagName, rscriptType, wrapMap, getAll, setGlobalEval
+) {
 
 var rhtml = /<|&#?\w+;/;
 
@@ -26,7 +32,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 
 				// Support: Android<4.1, PhantomJS<2
 				// push.apply(_, arraylike) throws on ancient WebKit
-				jQuery.merge( nodes, elem.nodeType ? [ elem ] : elem );
+				jQuery.merge( nodes, elem[ domType ] ? [ elem ] : elem );
 
 			// Convert non-html into a text node
 			} else if ( !rhtml.test( elem ) ) {
@@ -34,7 +40,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 
 			// Convert html into DOM nodes
 			} else {
-				tmp = tmp || fragment.appendChild( context.createElement( "div" ) );
+				tmp = tmp || fragment.appendChild( createElem( "div", context ) );
 
 				// Deserialize a standard representation
 				tag = ( rtagName.exec( elem ) || [ "", "" ] )[ 1 ].toLowerCase();
@@ -74,7 +80,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 			continue;
 		}
 
-		contains = jQuery.contains( elem.ownerDocument, elem );
+		contains = jQuery.contains( elem[ getOwnDoc ], elem );
 
 		// Append to fragment
 		tmp = getAll( fragment.appendChild( elem ), "script" );

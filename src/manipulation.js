@@ -16,14 +16,27 @@ define( [
 	"./data/var/dataUser",
 	"./data/var/acceptData",
 
+	"./var/createElem",
+	"./var/strlower",
+	"./var/getByTag",
+	"./var/getOwnDoc",
+	"./var/getAttr",
+	"./var/domNode",
+	"./var/domType",
+	"./var/domParent",
+	"./var/domNext",
+	"./var/undef",
+
 	"./core/init",
 	"./traversing",
 	"./selector",
 	"./event"
-], function( jQuery, concat, push, access,
-	rcheckableType, rtagName, rscriptType,
-	wrapMap, getAll, setGlobalEval, buildFragment, support,
-	dataPriv, dataUser, acceptData ) {
+], function(
+	jQuery, concat, push, access, rcheckableType, rtagName, rscriptType,
+	wrapMap, getAll, setGlobalEval, buildFragment, support, dataPriv, dataUser, acceptData,
+	createElem, strlower, getByTag, getOwnDoc, getAttr, domNode, domType,
+	domParent, domNext, undef
+) {
 
 var
 	rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:-]+)[^>]*)\/>/gi,
@@ -40,17 +53,17 @@ var
 
 // Manipulating tables requires a tbody
 function manipulationTarget( elem, content ) {
-	return jQuery.nodeName( elem, "table" ) &&
-		jQuery.nodeName( content.nodeType !== 11 ? content : content.firstChild, "tr" ) ?
+	return jQuery[ domNode ]( elem, "table" ) &&
+		jQuery[ domNode ]( content[ domType ] !== 11 ? content : content.firstChild, "tr" ) ?
 
-		elem.getElementsByTagName( "tbody" )[ 0 ] ||
-			elem.appendChild( elem.ownerDocument.createElement( "tbody" ) ) :
+		elem[ getByTag ]( "tbody" )[ 0 ] ||
+			elem.appendChild( createElem( "tbody", elem[ getOwnDoc ] ) ) :
 		elem;
 }
 
 // Replace/restore the type attribute of script elements for safe DOM manipulation
 function disableScript( elem ) {
-	elem.type = ( elem.getAttribute( "type" ) !== null ) + "/" + elem.type;
+	elem.type = ( elem[ getAttr ]( "type" ) !== null ) + "/" + elem.type;
 	return elem;
 }
 function restoreScript( elem ) {
@@ -68,7 +81,7 @@ function restoreScript( elem ) {
 function cloneCopyEvent( src, dest ) {
 	var i, l, type, pdataOld, pdataCur, udataOld, udataCur, events;
 
-	if ( dest.nodeType !== 1 ) {
+	if ( dest[ domType ] !== 1 ) {
 		return;
 	}
 
@@ -101,15 +114,18 @@ function cloneCopyEvent( src, dest ) {
 
 // Fix IE bugs, see support tests
 function fixInput( src, dest ) {
-	var nodeName = dest.nodeName.toLowerCase();
+	var nodeName = strlower( dest[ domNode ] ),
+		inp = "input",
+		chk = "checked",
+		dfv =  "defaultValue";
 
 	// Fails to persist the checked state of a cloned checkbox or radio button.
-	if ( nodeName === "input" && rcheckableType.test( src.type ) ) {
-		dest.checked = src.checked;
+	if ( nodeName === inp && rcheckableType.test( src.type ) ) {
+		dest[ chk ] = src[ chk ];
 
 	// Fails to return the selected option to the default selected state when cloning options
-	} else if ( nodeName === "input" || nodeName === "textarea" ) {
-		dest.defaultValue = src.defaultValue;
+	} else if ( nodeName === inp || nodeName === "textarea" ) {
+		dest[ dfv ] = src[ dfv ];
 	}
 }
 
@@ -121,6 +137,7 @@ function domManip( collection, args, callback, ignored ) {
 	var fragment, first, scripts, hasScripts, node, doc,
 		i = 0,
 		l = collection.length,
+		s = "script",
 		iNoClone = l - 1,
 		value = args[ 0 ],
 		isFunction = jQuery.isFunction( value );
@@ -139,7 +156,7 @@ function domManip( collection, args, callback, ignored ) {
 	}
 
 	if ( l ) {
-		fragment = buildFragment( args, collection[ 0 ].ownerDocument, false, collection, ignored );
+		fragment = buildFragment( args, collection[ 0 ][ getOwnDoc ], false, collection, ignored );
 		first = fragment.firstChild;
 
 		if ( fragment.childNodes.length === 1 ) {
@@ -148,7 +165,7 @@ function domManip( collection, args, callback, ignored ) {
 
 		// Require either new content or an interest in ignored elements to invoke the callback
 		if ( first || ignored ) {
-			scripts = jQuery.map( getAll( fragment, "script" ), disableScript );
+			scripts = jQuery.map( getAll( fragment, s ), disableScript );
 			hasScripts = scripts.length;
 
 			// Use the original fragment for the last item
@@ -165,7 +182,7 @@ function domManip( collection, args, callback, ignored ) {
 
 						// Support: Android<4.1, PhantomJS<2
 						// push.apply(_, arraylike) throws on ancient WebKit
-						jQuery.merge( scripts, getAll( node, "script" ) );
+						jQuery.merge( scripts, getAll( node, s ) );
 					}
 				}
 
@@ -173,7 +190,7 @@ function domManip( collection, args, callback, ignored ) {
 			}
 
 			if ( hasScripts ) {
-				doc = scripts[ scripts.length - 1 ].ownerDocument;
+				doc = scripts[ scripts.length - 1 ][ getOwnDoc ];
 
 				// Reenable scripts
 				jQuery.map( scripts, restoreScript );
@@ -209,15 +226,15 @@ function remove( elem, selector, keepData ) {
 		i = 0;
 
 	for ( ; ( node = nodes[ i ] ) != null; i++ ) {
-		if ( !keepData && node.nodeType === 1 ) {
+		if ( !keepData && node[ domType ] === 1 ) {
 			jQuery.cleanData( getAll( node ) );
 		}
 
-		if ( node.parentNode ) {
-			if ( keepData && jQuery.contains( node.ownerDocument, node ) ) {
+		if ( node[ domParent ] ) {
+			if ( keepData && jQuery.contains( node[ getOwnDoc ], node ) ) {
 				setGlobalEval( getAll( node, "script" ) );
 			}
-			node.parentNode.removeChild( node );
+			node[ domParent ].removeChild( node );
 		}
 	}
 
@@ -231,9 +248,10 @@ jQuery.extend( {
 
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
 		var i, l, srcElements, destElements,
-			nType = elem.nodeType,
+			s = "script",
+			nType = elem[ domType ],
 			clone = elem.cloneNode( true ),
-			inPage = jQuery.contains( elem.ownerDocument, elem );
+			inPage = jQuery.contains( elem[ getOwnDoc ], elem );
 
 		// Fix IE cloning issues
 		if ( !support.noCloneChecked && ( nType === 1 || nType === 11 ) &&
@@ -263,9 +281,9 @@ jQuery.extend( {
 		}
 
 		// Preserve script evaluation history
-		destElements = getAll( clone, "script" );
+		destElements = getAll( clone, s );
 		if ( destElements.length > 0 ) {
-			setGlobalEval( destElements, !inPage && getAll( elem, "script" ) );
+			setGlobalEval( destElements, !inPage && getAll( elem, s ) );
 		}
 
 		// Return the cloned set
@@ -275,11 +293,12 @@ jQuery.extend( {
 	cleanData: function( elems ) {
 		var data, elem, type,
 			special = jQuery.event.special,
+			x = "expando",
 			i = 0;
 
-		for ( ; ( elem = elems[ i ] ) !== undefined; i++ ) {
+		for ( ; ( elem = elems[ i ] ) !== undef; i++ ) {
 			if ( acceptData( elem ) ) {
-				if ( ( data = elem[ dataPriv.expando ] ) ) {
+				if ( ( data = elem[ dataPriv[ x ] ] ) ) {
 					if ( data.events ) {
 						for ( type in data.events ) {
 							if ( special[ type ] ) {
@@ -294,13 +313,13 @@ jQuery.extend( {
 
 					// Support: Chrome <= 35-45+
 					// Assign undefined instead of using delete, see Data#remove
-					elem[ dataPriv.expando ] = undefined;
+					elem[ dataPriv[ x ] ] = undef;
 				}
-				if ( elem[ dataUser.expando ] ) {
+				if ( elem[ dataUser[ x ] ] ) {
 
 					// Support: Chrome <= 35-45+
 					// Assign undefined instead of using delete, see Data#remove
-					elem[ dataUser.expando ] = undefined;
+					elem[ dataUser[ x ] ] = undef;
 				}
 			}
 		}
@@ -322,10 +341,10 @@ jQuery.fn.extend( {
 
 	text: function( value ) {
 		return access( this, function( value ) {
-			return value === undefined ?
+			return value === undef ?
 				jQuery.text( this ) :
 				this.empty().each( function() {
-					var nType = this.nodeType;
+					var nType = this[ domType ];
 					if ( nType === 1 || nType === 11 || nType === 9 ) {
 						this.textContent = value;
 					}
@@ -335,7 +354,7 @@ jQuery.fn.extend( {
 
 	append: function() {
 		return domManip( this, arguments, function( elem ) {
-			var nType = this.nodeType, target;
+			var nType = this[ domType ], target;
 			if ( nType === 1 || nType === 11 || nType === 9 ) {
 				target = manipulationTarget( this, elem );
 				target.appendChild( elem );
@@ -345,7 +364,7 @@ jQuery.fn.extend( {
 
 	prepend: function() {
 		return domManip( this, arguments, function( elem ) {
-			var nType = this.nodeType, target;
+			var nType = this[ domType ], target;
 			if ( nType === 1 || nType === 11 || nType === 9 ) {
 				target = manipulationTarget( this, elem );
 				target.insertBefore( elem, target.firstChild );
@@ -356,7 +375,7 @@ jQuery.fn.extend( {
 	before: function() {
 		return domManip( this, arguments, function( elem ) {
 			var parent;
-			if ( parent = this.parentNode ) {
+			if ( parent = this[ domParent ] ) {
 				parent.insertBefore( elem, this );
 			}
 		} );
@@ -365,8 +384,8 @@ jQuery.fn.extend( {
 	after: function() {
 		return domManip( this, arguments, function( elem ) {
 			var parent;
-			if ( parent = this.parentNode ) {
-				parent.insertBefore( elem, this.nextSibling );
+			if ( parent = this[ domParent ] ) {
+				parent.insertBefore( elem, this[ domNext ] );
 			}
 		} );
 	},
@@ -376,7 +395,7 @@ jQuery.fn.extend( {
 			i = 0;
 
 		for ( ; ( elem = this[ i ] ) != null; i++ ) {
-			if ( elem.nodeType === 1 ) {
+			if ( elem[ domType ] === 1 ) {
 
 				// Prevent memory leaks
 				jQuery.cleanData( getAll( elem, false ) );
@@ -402,15 +421,16 @@ jQuery.fn.extend( {
 		return access( this, function( value ) {
 			var elem = this[ 0 ] || {},
 				i = 0,
-				l = this.length;
+				l = this.length,
+				iH = "innerHTML";
 
-			if ( value === undefined && elem.nodeType === 1 ) {
-				return elem.innerHTML;
+			if ( value === undef && elem[ domType ] === 1 ) {
+				return elem[ iH ];
 			}
 
 			// See if we can take a shortcut and just use innerHTML
 			if ( typeof value === "string" && !rnoInnerhtml.test( value ) &&
-				!wrapMap[ ( rtagName.exec( value ) || [ "", "" ] )[ 1 ].toLowerCase() ] ) {
+				!wrapMap[ strlower( ( rtagName.exec( value ) || [ "", "" ] )[ 1 ] ) ] ) {
 
 				value = jQuery.htmlPrefilter( value );
 
@@ -419,9 +439,9 @@ jQuery.fn.extend( {
 						elem = this[ i ] || {};
 
 						// Remove element nodes and prevent memory leaks
-						if ( elem.nodeType === 1 ) {
+						if ( elem[ domType ] === 1 ) {
 							jQuery.cleanData( getAll( elem, false ) );
-							elem.innerHTML = value;
+							elem[ iH ] = value;
 						}
 					}
 
@@ -442,7 +462,7 @@ jQuery.fn.extend( {
 
 		// Make the changes, replacing each non-ignored context element with the new content
 		return domManip( this, arguments, function( elem ) {
-			var parent = this.parentNode;
+			var parent = this[ domParent ];
 
 			if ( jQuery.inArray( this, ignored ) < 0 ) {
 				jQuery.cleanData( getAll( this ) );

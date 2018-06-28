@@ -12,10 +12,12 @@ var wrapMap = {
 	thead: [ 1, "<table>", "</table>" ],
 	col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
 	tr: [ 2, "<table><tbody>", "</tbody></table>" ],
-	td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
+
+	// td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
 
 	_default: [ 0, "", "" ]
 };
+wrapMap.td = [ 3, wrapMap.tr[ 1 ] + "<tr>", "</tr>" + wrapMap.tr[ 2 ] ];
 
 // Support: IE9
 wrapMap.optgroup = wrapMap.option;

@@ -4,20 +4,22 @@ define( [
 	"./var/rmargin",
 	"./var/getStyles",
 	"./support",
+	"../var/getOwnDoc",
+	"../var/undef",
 	"../selector" // Get jQuery.contains
-], function( jQuery, rnumnonpx, rmargin, getStyles, support ) {
+], function( jQuery, rnumnonpx, rmargin, getStyles, support, getOwnDoc, undef ) {
 
 function curCSS( elem, name, computed ) {
 	var width, minWidth, maxWidth, ret,
 		style = elem.style;
 
 	computed = computed || getStyles( elem );
-	ret = computed ? computed.getPropertyValue( name ) || computed[ name ] : undefined;
+	ret = computed ? computed.getPropertyValue( name ) || computed[ name ] : undef;
 
 	// Support: Opera 12.1x only
 	// Fall back to style even without computed
 	// computed is undefined for elems on document fragments
-	if ( ( ret === "" || ret === undefined ) && !jQuery.contains( elem.ownerDocument, elem ) ) {
+	if ( ( ret === "" || ret === undef ) && !jQuery.contains( elem[ getOwnDoc ], elem ) ) {
 		ret = jQuery.style( elem, name );
 	}
 
@@ -48,7 +50,7 @@ function curCSS( elem, name, computed ) {
 		}
 	}
 
-	return ret !== undefined ?
+	return ret !== undef ?
 
 		// Support: IE9-11+
 		// IE returns zIndex value as an integer.

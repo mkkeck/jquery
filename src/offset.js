@@ -7,29 +7,39 @@ define( [
 	"./css/curCSS",
 	"./css/addGetHookIf",
 	"./css/support",
+	"./var/getOwnDoc",
+	"./var/getDocElem",
+	"./var/domNode",
+	"./var/domType",
+	"./var/undef",
 
 	"./core/init",
 	"./css",
 	"./selector" // contains
-], function( jQuery, access, document, documentElement, rnumnonpx, curCSS, addGetHookIf, support ) {
+], function(
+	jQuery, access, document, documentElement, rnumnonpx,
+	curCSS, addGetHookIf, support,
+	getOwnDoc, getDocElem, domNode, domType, undef
+) {
 
 /**
  * Gets a window from an element
  */
 function getWindow( elem ) {
-	return jQuery.isWindow( elem ) ? elem : elem.nodeType === 9 && elem.defaultView;
+	return jQuery.isWindow( elem ) ? elem : elem[ domType ] === 9 && elem.defaultView;
 }
 
 jQuery.offset = {
 	setOffset: function( elem, options, i ) {
 		var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft, calculatePosition,
-			position = jQuery.css( elem, "position" ),
+			pos = "position",
+			position = jQuery.css( elem, pos ),
 			curElem = jQuery( elem ),
 			props = {};
 
 		// Set position first, in-case top/left are set even on static elem
 		if ( position === "static" ) {
-			elem.style.position = "relative";
+			elem.style[ pos ] = "relative";
 		}
 
 		curOffset = curElem.offset();
@@ -41,7 +51,7 @@ jQuery.offset = {
 		// Need to be able to calculate position if either
 		// top or left is auto and position is either absolute or fixed
 		if ( calculatePosition ) {
-			curPosition = curElem.position();
+			curPosition = curElem[ pos ]();
 			curTop = curPosition.top;
 			curLeft = curPosition.left;
 
@@ -75,7 +85,7 @@ jQuery.offset = {
 jQuery.fn.extend( {
 	offset: function( options ) {
 		if ( arguments.length ) {
-			return options === undefined ?
+			return options === undef ?
 				this :
 				this.each( function( i ) {
 					jQuery.offset.setOffset( this, options, i );
@@ -85,13 +95,13 @@ jQuery.fn.extend( {
 		var docElem, win,
 			elem = this[ 0 ],
 			box = { top: 0, left: 0 },
-			doc = elem && elem.ownerDocument;
+			doc = elem && elem[ getOwnDoc ];
 
 		if ( !doc ) {
 			return;
 		}
 
-		docElem = doc.documentElement;
+		docElem = doc[ getDocElem ];
 
 		// Make sure it's not a disconnected DOM node
 		if ( !jQuery.contains( docElem, elem ) ) {
@@ -129,7 +139,7 @@ jQuery.fn.extend( {
 
 			// Get correct offsets
 			offset = this.offset();
-			if ( !jQuery.nodeName( offsetParent[ 0 ], "html" ) ) {
+			if ( !jQuery[ domNode ]( offsetParent[ 0 ], "html" ) ) {
 				parentOffset = offsetParent.offset();
 			}
 
@@ -176,7 +186,7 @@ jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( 
 		return access( this, function( elem, method, val ) {
 			var win = getWindow( elem );
 
-			if ( val === undefined ) {
+			if ( val === undef ) {
 				return win ? win[ prop ] : elem[ method ];
 			}
 

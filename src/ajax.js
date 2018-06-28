@@ -5,13 +5,20 @@ define( [
 	"./ajax/var/location",
 	"./ajax/var/nonce",
 	"./ajax/var/rquery",
+	"./var/createElem",
+	"./var/domType",
+	"./var/strlower",
+	"./var/undef",
 
 	"./core/init",
 	"./ajax/parseJSON",
 	"./ajax/parseXML",
 	"./event/trigger",
 	"./deferred"
-], function( jQuery, document, rnotwhite, location, nonce, rquery ) {
+], function(
+	jQuery, document, rnotwhite, location, nonce, rquery,
+	createElem, domType, strlower, undef
+) {
 
 var
 	rhash = /#.*$/,
@@ -45,7 +52,7 @@ var
 	allTypes = "*/".concat( "*" ),
 
 	// Anchor tag for parsing the document origin
-	originAnchor = document.createElement( "a" );
+	originAnchor = createElem( "a", document );
 	originAnchor.href = location.href;
 
 // Base "constructor" for jQuery.ajaxPrefilter and jQuery.ajaxTransport
@@ -61,7 +68,7 @@ function addToPrefiltersOrTransports( structure ) {
 
 		var dataType,
 			i = 0,
-			dataTypes = dataTypeExpression.toLowerCase().match( rnotwhite ) || [];
+			dataTypes = strlower( dataTypeExpression ).match( rnotwhite ) || [];
 
 		if ( jQuery.isFunction( func ) ) {
 
@@ -91,7 +98,7 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 	function inspect( dataType ) {
 		var selected;
 		inspected[ dataType ] = true;
-		jQuery.each( structure[ dataType ] || [], function( _, prefilterOrFactory ) {
+		( structure[ dataType ] || [] ).forEach( function( prefilterOrFactory ) {
 			var dataTypeOrTransport = prefilterOrFactory( options, originalOptions, jqXHR );
 			if ( typeof dataTypeOrTransport === "string" &&
 				!seekingTransport && !inspected[ dataTypeOrTransport ] ) {
@@ -117,7 +124,7 @@ function ajaxExtend( target, src ) {
 		flatOptions = jQuery.ajaxSettings.flatOptions || {};
 
 	for ( key in src ) {
-		if ( src[ key ] !== undefined ) {
+		if ( src[ key ] !== undef ) {
 			( flatOptions[ key ] ? target : ( deep || ( deep = {} ) ) )[ key ] = src[ key ];
 		}
 	}
@@ -141,7 +148,7 @@ function ajaxHandleResponses( s, jqXHR, responses ) {
 	// Remove auto dataType and get content-type in the process
 	while ( dataTypes[ 0 ] === "*" ) {
 		dataTypes.shift();
-		if ( ct === undefined ) {
+		if ( ct === undef ) {
 			ct = s.mimeType || jqXHR.getResponseHeader( "Content-Type" );
 		}
 	}
@@ -200,7 +207,7 @@ function ajaxConvert( s, response, jqXHR, isSuccess ) {
 	// Create converters map with lowercased keys
 	if ( dataTypes[ 1 ] ) {
 		for ( conv in s.converters ) {
-			converters[ conv.toLowerCase() ] = s.converters[ conv ];
+			converters[ strlower( conv ) ] = s.converters[ conv ];
 		}
 	}
 
@@ -209,8 +216,8 @@ function ajaxConvert( s, response, jqXHR, isSuccess ) {
 	// Convert to each sequential dataType
 	while ( current ) {
 
-		if ( s.responseFields[ current ] ) {
-			jqXHR[ s.responseFields[ current ] ] = response;
+		if ( tmp = s.responseFields[ current ] ) {
+			jqXHR[ tmp ] = response;
 		}
 
 		// Apply the dataFilter if provided
@@ -384,7 +391,7 @@ jQuery.extend( {
 		// If url is an object, simulate pre-1.5 signature
 		if ( typeof url === "object" ) {
 			options = url;
-			url = undefined;
+			url = undef;
 		}
 
 		// Force options to be an object
@@ -419,7 +426,7 @@ jQuery.extend( {
 
 			// Context for global events is callbackContext if it is a DOM node or jQuery collection
 			globalEventContext = s.context &&
-				( callbackContext.nodeType || callbackContext.jquery ) ?
+				( callbackContext[ domType ] || callbackContext.jquery ) ?
 					jQuery( callbackContext ) :
 					jQuery.event,
 
@@ -433,6 +440,8 @@ jQuery.extend( {
 			// Headers (they are sent all at once)
 			requestHeaders = {},
 			requestHeadersNames = {},
+
+			setReqHeader = "setRequestHeader",
 
 			// The jqXHR state
 			state = 0,
@@ -454,10 +463,10 @@ jQuery.extend( {
 						if ( !responseHeaders ) {
 							responseHeaders = {};
 							while ( ( match = rheaders.exec( responseHeadersString ) ) ) {
-								responseHeaders[ match[ 1 ].toLowerCase() ] = match[ 2 ];
+								responseHeaders[ strlower( match[ 1 ] ) ] = match[ 2 ];
 							}
 						}
-						match = responseHeaders[ key.toLowerCase() ];
+						match = responseHeaders[ strlower( key ) ];
 					}
 					return match == null ? null : match;
 				},
@@ -469,7 +478,7 @@ jQuery.extend( {
 
 				// Caches the header
 				setRequestHeader: function( name, value ) {
-					var lname = name.toLowerCase();
+					var lname = strlower( name );
 					if ( !state ) {
 						name = requestHeadersNames[ lname ] = requestHeadersNames[ lname ] || name;
 						requestHeaders[ name ] = value;
@@ -531,11 +540,11 @@ jQuery.extend( {
 		s.type = options.method || options.type || s.method || s.type;
 
 		// Extract dataTypes list
-		s.dataTypes = jQuery.trim( s.dataType || "*" ).toLowerCase().match( rnotwhite ) || [ "" ];
+		s.dataTypes = strlower( jQuery.trim( s.dataType || "*" ) ).match( rnotwhite ) || [ "" ];
 
 		// A cross-domain request is in order when the origin doesn't match the current origin.
 		if ( s.crossDomain == null ) {
-			urlAnchor = document.createElement( "a" );
+			urlAnchor = createElem( "a", document );
 
 			// Support: IE8-11+
 			// IE throws exception if url is malformed, e.g. http://example.com:80x/
@@ -613,20 +622,20 @@ jQuery.extend( {
 		// Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
 		if ( s.ifModified ) {
 			if ( temp = jQuery.lastModified[ cacheURL ] ) {
-				jqXHR.setRequestHeader( "If-Modified-Since", temp );
+				jqXHR[ setReqHeader ]( "If-Modified-Since", temp );
 			}
 			if ( temp = jQuery.etag[ cacheURL ] ) {
-				jqXHR.setRequestHeader( "If-None-Match", temp );
+				jqXHR[ setReqHeader ]( "If-None-Match", temp );
 			}
 		}
 
 		// Set the correct header, if data is being sent
 		if ( s.data && s.hasContent && s.contentType !== false || options.contentType ) {
-			jqXHR.setRequestHeader( "Content-Type", s.contentType );
+			jqXHR[ setReqHeader ]( "Content-Type", s.contentType );
 		}
 
 		// Set the Accepts header for the server, depending on the dataType
-		jqXHR.setRequestHeader(
+		jqXHR[ setReqHeader ](
 			"Accept",
 			s.dataTypes[ 0 ] && s.accepts[ s.dataTypes[ 0 ] ] ?
 				s.accepts[ s.dataTypes[ 0 ] ] +
@@ -636,7 +645,7 @@ jQuery.extend( {
 
 		// Check for headers option
 		for ( i in s.headers ) {
-			jqXHR.setRequestHeader( i, s.headers[ i ] );
+			jqXHR[ setReqHeader ]( i, s.headers[ i ] );
 		}
 
 		// Allow custom headers/mimetypes and early abort
@@ -717,7 +726,7 @@ jQuery.extend( {
 
 			// Dereference transport for early garbage collection
 			// (no matter how long the jqXHR object will be used)
-			transport = undefined;
+			transport = undef;
 
 			// Cache response headers
 			responseHeadersString = headers || "";
@@ -791,7 +800,7 @@ jQuery.extend( {
 
 			// Status-dependent callbacks
 			jqXHR.statusCode( statusCode );
-			statusCode = undefined;
+			statusCode = undef;
 
 			if ( fireGlobals ) {
 				globalEventContext.trigger( isSuccess ? "ajaxSuccess" : "ajaxError",
@@ -819,7 +828,7 @@ jQuery.extend( {
 	},
 
 	getScript: function( url, callback ) {
-		return jQuery.get( url, undefined, callback, "script" );
+		return jQuery.get( url, undef, callback, "script" );
 	}
 } );
 
@@ -830,7 +839,7 @@ jQuery.extend( {
 		if ( jQuery.isFunction( data ) ) {
 			type = type || callback;
 			callback = data;
-			data = undefined;
+			data = undef;
 		}
 
 		// The url can be an options object (which then must have .url)

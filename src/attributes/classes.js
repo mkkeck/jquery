@@ -2,13 +2,18 @@ define( [
 	"../core",
 	"../var/rnotwhite",
 	"../data/var/dataPriv",
+	"../var/getAttr",
+	"../var/setAttr",
+	"../var/domType",
+	"../var/undef",
+
 	"../core/init"
-], function( jQuery, rnotwhite, dataPriv ) {
+], function( jQuery, rnotwhite, dataPriv, getAttr, setAttr, domType, undef ) {
 
 var rclass = /[\t\r\n\f]/g;
 
 function getClass( elem ) {
-	return elem.getAttribute && elem.getAttribute( "class" ) || "";
+	return elem[ getAttr ] && elem[ getAttr ]( "class" ) || "";
 }
 
 jQuery.fn.extend( {
@@ -27,7 +32,7 @@ jQuery.fn.extend( {
 
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
-				cur = elem.nodeType === 1 &&
+				cur = elem[ domType ] === 1 &&
 					( " " + curValue + " " ).replace( rclass, " " );
 
 				if ( cur ) {
@@ -41,7 +46,7 @@ jQuery.fn.extend( {
 					// Only assign if different to avoid unneeded rendering.
 					finalValue = jQuery.trim( cur );
 					if ( curValue !== finalValue ) {
-						elem.setAttribute( "class", finalValue );
+						elem[ setAttr ]( "class", finalValue );
 					}
 				}
 			}
@@ -71,7 +76,7 @@ jQuery.fn.extend( {
 				curValue = getClass( elem );
 
 				// This expression is here for better compressibility (see addClass)
-				cur = elem.nodeType === 1 &&
+				cur = elem[ domType ] === 1 &&
 					( " " + curValue + " " ).replace( rclass, " " );
 
 				if ( cur ) {
@@ -87,7 +92,7 @@ jQuery.fn.extend( {
 					// Only assign if different to avoid unneeded rendering.
 					finalValue = jQuery.trim( cur );
 					if ( curValue !== finalValue ) {
-						elem.setAttribute( "class", finalValue );
+						elem[ setAttr ]( "class", finalValue );
 					}
 				}
 			}
@@ -134,7 +139,7 @@ jQuery.fn.extend( {
 				}
 
 			// Toggle whole class name
-			} else if ( value === undefined || type === "boolean" ) {
+			} else if ( value === undef || type === "boolean" ) {
 				className = getClass( this );
 				if ( className ) {
 
@@ -146,8 +151,8 @@ jQuery.fn.extend( {
 				// then remove the whole classname (if there was one, the above saved it).
 				// Otherwise bring back whatever was previously saved (if anything),
 				// falling back to the empty string if nothing was stored.
-				if ( this.setAttribute ) {
-					this.setAttribute( "class",
+				if ( this[ setAttr ] ) {
+					this[ setAttr ]( "class",
 						className || value === false ?
 						"" :
 						dataPriv.get( this, classPriv ) || ""
@@ -163,7 +168,7 @@ jQuery.fn.extend( {
 
 		className = " " + selector + " ";
 		while ( ( elem = this[ i++ ] ) ) {
-			if ( elem.nodeType === 1 &&
+			if ( elem[ domType ] === 1 &&
 				( " " + getClass( elem ) + " " ).replace( rclass, " " )
 					.indexOf( className ) > -1
 			) {

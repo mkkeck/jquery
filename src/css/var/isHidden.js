@@ -1,9 +1,10 @@
 define( [
 	"../../core",
+	"../../var/getOwnDoc",
 	"../../selector"
 
 	// css is assumed
-], function( jQuery ) {
+], function( jQuery, getOwnDoc ) {
 
 	return function( elem, el ) {
 
@@ -11,6 +12,6 @@ define( [
 		// in that case, element will be second argument
 		elem = el || elem;
 		return jQuery.css( elem, "display" ) === "none" ||
-			!jQuery.contains( elem.ownerDocument, elem );
+			!jQuery.contains( elem[ getOwnDoc ], elem );
 	};
 } );

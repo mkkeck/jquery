@@ -1,12 +1,13 @@
 define( [
 	"../var/document",
-	"../var/support"
-], function( document, support ) {
+	"../var/support",
+	"../var/createElem"
+], function( document, support, createElem ) {
 
 ( function() {
-	var input = document.createElement( "input" ),
-		select = document.createElement( "select" ),
-		opt = select.appendChild( document.createElement( "option" ) );
+	var input = createElem( "input", document ),
+		select = createElem( "select", document ),
+		opt = select.appendChild( createElem( "option", document ) );
 
 	input.type = "checkbox";
 
@@ -25,7 +26,7 @@ define( [
 
 	// Support: IE<=11+
 	// An input loses its value after becoming a radio
-	input = document.createElement( "input" );
+	input = createElem( "input", document );
 	input.value = "t";
 	input.type = "radio";
 	support.radioValue = input.value === "t";

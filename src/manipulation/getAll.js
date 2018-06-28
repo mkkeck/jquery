@@ -1,6 +1,10 @@
 define( [
-	"../core"
-], function( jQuery ) {
+	"../core",
+  "../var/getByTag",
+  "../var/getByQSA",
+  "../var/domNode",
+  "../var/undef"
+], function( jQuery, getByTag, getByQSA, domNode, undef ) {
 
 function getAll( context, tag ) {
 
@@ -8,14 +12,13 @@ function getAll( context, tag ) {
 	// Use typeof to avoid zero-argument method invocation on host objects (#15151)
 	var
 		query = tag || "*",
-		undef = "undefined",
-		ret = typeof context.getElementsByTagName !== undef ?
-			context.getElementsByTagName( query ) :
-			typeof context.querySelectorAll !== undef ?
-				context.querySelectorAll( query ) :
+		ret = typeof context[ getByTag ] !== "undefined" ?
+			context[ getByTag ]( query ) :
+			typeof context[ getByQSA ] !== "undefined" ?
+				context[ getByQSA ]( query ) :
 			[];
 
-	return tag === undefined || tag && jQuery.nodeName( context, tag ) ?
+	return tag === undef || tag && jQuery[ domNode ]( context, tag ) ?
 		jQuery.merge( [ context ], ret ) :
 		ret;
 }

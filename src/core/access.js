@@ -1,6 +1,7 @@
 define( [
-	"../core"
-], function( jQuery ) {
+	"../core",
+  "../var/undef"
+], function( jQuery, undef ) {
 
 // Multifunctional method to get and set values of a collection
 // The value/s can optionally be executed if it's a function
@@ -17,7 +18,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		}
 
 	// Sets one value
-	} else if ( value !== undefined ) {
+	} else if ( value !== undef ) {
 		chainable = true;
 
 		if ( !jQuery.isFunction( value ) ) {

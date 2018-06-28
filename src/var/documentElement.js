@@ -1,5 +1,6 @@
 define( [
-	"./document"
-], function( document ) {
-	return document.documentElement;
+	"./document",
+	"./getDocElem"
+], function( document, getDocElem ) {
+	return document[ getDocElem ];
 } );

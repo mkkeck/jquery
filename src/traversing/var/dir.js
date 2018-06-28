@@ -1,13 +1,15 @@
 define( [
-	"../../core"
-], function( jQuery ) {
+	"../../core",
+  "../../var/domType",
+  "../../var/undef"
+], function( jQuery, domType, undef ) {
 
 return function( elem, dir, until ) {
 	var matched = [],
-		truncate = until !== undefined;
+		truncate = until !== undef;
 
-	while ( ( elem = elem[ dir ] ) && elem.nodeType !== 9 ) {
-		if ( elem.nodeType === 1 ) {
+	while ( ( elem = elem[ dir ] ) && elem[ domType ] !== 9 ) {
+		if ( elem[ domType ] === 1 ) {
 			if ( truncate && jQuery( elem ).is( until ) ) {
 				break;
 			}

@@ -1,5 +1,6 @@
 define( [
 	"../core",
+	"../var/undef",
 	"../core/parseHTML",
 	"../ajax",
 	"../traversing",
@@ -8,7 +9,7 @@ define( [
 
 	// Optional event/alias dependency
 	"../event/alias"
-], function( jQuery ) {
+], function( jQuery, undef ) {
 
 // Keep a copy of the old load method
 var _load = jQuery.fn.load;
@@ -35,7 +36,7 @@ jQuery.fn.load = function( url, params, callback ) {
 
 		// We assume that it's the callback
 		callback = params;
-		params = undefined;
+		params = undef;
 
 	// Otherwise, build a param string
 	} else if ( params && typeof params === "object" ) {

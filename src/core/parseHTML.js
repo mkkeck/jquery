@@ -1,9 +1,10 @@
 define( [
 	"../core",
 	"../var/document",
+	"../var/createElem",
 	"./var/rsingleTag",
 	"../manipulation/buildFragment"
-], function( jQuery, document, rsingleTag, buildFragment ) {
+], function( jQuery, document, createElem, rsingleTag, buildFragment ) {
 
 // Argument "data" should be string of html
 // context (optional): If specified, the fragment will be created in this context,
@@ -24,7 +25,7 @@ jQuery.parseHTML = function( data, context, keepScripts ) {
 
 	// Single tag
 	if ( parsed ) {
-		return [ context.createElement( parsed[ 1 ] ) ];
+		return [ createElem( parsed[ 1 ], context ) ];
 	}
 
 	parsed = buildFragment( [ data ], context, scripts );

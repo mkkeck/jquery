@@ -2,8 +2,10 @@ define( [
 	"../core",
 	"./var/nonce",
 	"./var/rquery",
+	"../var/undef",
+
 	"../ajax"
-], function( jQuery, nonce, rquery ) {
+], function( jQuery, nonce, rquery, undef ) {
 
 var oldCallbacks = [],
 	rjsonp = /(=)\?(?=&|$)|\?\?/;
@@ -22,6 +24,7 @@ jQuery.ajaxSetup( {
 jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 
 	var callbackName, overwritten, responseContainer,
+		jsonCB = "jsonpCallback",
 		jsonProp = s.jsonp !== false && ( rjsonp.test( s.url ) ?
 			"url" :
 			typeof s.data === "string" &&
@@ -34,9 +37,9 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 	if ( jsonProp || s.dataTypes[ 0 ] === "jsonp" ) {
 
 		// Get callback name, remembering preexisting value associated with it
-		callbackName = s.jsonpCallback = jQuery.isFunction( s.jsonpCallback ) ?
-			s.jsonpCallback() :
-			s.jsonpCallback;
+		callbackName = s[ jsonCB ] = jQuery.isFunction( s[ jsonCB ] ) ?
+			s[ jsonCB ]() :
+			s[ jsonCB ];
 
 		// Insert callback into url or form data
 		if ( jsonProp ) {
@@ -66,7 +69,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 		jqXHR.always( function() {
 
 			// If previous value didn't exist - remove it
-			if ( overwritten === undefined ) {
+			if ( overwritten === undef ) {
 				jQuery( window ).removeProp( callbackName );
 
 			// Otherwise restore preexisting value
@@ -78,7 +81,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 			if ( s[ callbackName ] ) {
 
 				// Make sure that re-using the options doesn't screw things around
-				s.jsonpCallback = originalSettings.jsonpCallback;
+				s[ jsonCB ] = originalSettings[ jsonCB ];
 
 				// Save the callback name for future use
 				oldCallbacks.push( callbackName );
@@ -89,7 +92,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 				overwritten( responseContainer[ 0 ] );
 			}
 
-			responseContainer = overwritten = undefined;
+			responseContainer = overwritten = undef;
 		} );
 
 		// Delegate to script

@@ -1,10 +1,12 @@
-define( function() {
+define( [
+	"../../var/domType"
+], function( domType ) {
 
 /**
  * Determines whether an object can have data
  */
 return function( owner ) {
-	var nType = owner.nodeType;
+	var nType = owner[ domType ];
 
 	// Accepts only:
 	//  - Node

@@ -1,9 +1,11 @@
 define( [
 	"../core",
 	"../var/indexOf",
+	"../var/domType",
 	"./var/rneedsContext",
+
 	"../selector"
-], function( jQuery, indexOf, rneedsContext ) {
+], function( jQuery, indexOf, domType, rneedsContext ) {
 
 var risSimple = /^.[^:#\[\.,]*$/;
 
@@ -17,7 +19,7 @@ function winnow( elements, qualifier, not ) {
 
 	}
 
-	if ( qualifier.nodeType ) {
+	if ( qualifier[ domType ] ) {
 		return jQuery.grep( elements, function( elem ) {
 			return ( elem === qualifier ) !== not;
 		} );
@@ -44,10 +46,10 @@ jQuery.filter = function( expr, elems, not ) {
 		expr = ":not(" + expr + ")";
 	}
 
-	return elems.length === 1 && elem.nodeType === 1 ?
+	return elems.length === 1 && elem[ domType ] === 1 ?
 		jQuery.find.matchesSelector( elem, expr ) ? [ elem ] : [] :
 		jQuery.find.matches( expr, jQuery.grep( elems, function( elem ) {
-			return elem.nodeType === 1;
+			return elem[ domType ] === 1;
 		} ) );
 };
 

@@ -1,12 +1,15 @@
 define( [
 	"../core",
 	"../var/document",
+	"../var/evtListenerAdd",
+	"../var/evtListenerRemove",
+
 	"../core/init",
 	"../deferred"
-], function( jQuery, document ) {
+], function( jQuery, document, evtListenerAdd, evtListenerRemove ) {
 
 // The deferred used on DOM ready
-var readyList;
+var readyList, domLoaded = "DOMContentLoaded";
 
 jQuery.fn.ready = function( fn ) {
 
@@ -65,8 +68,8 @@ jQuery.extend( {
  * The ready event handler and self cleanup method
  */
 function completed() {
-	document.removeEventListener( "DOMContentLoaded", completed );
-	window.removeEventListener( "load", completed );
+	document[ evtListenerRemove ]( domLoaded, completed );
+	window[ evtListenerRemove ]( "load", completed );
 	jQuery.ready();
 }
 
@@ -79,20 +82,23 @@ jQuery.ready.promise = function( obj ) {
 		// after the browser event has already occurred.
 		// Support: IE9-10 only
 		// Older IE sometimes signals "interactive" too soon
-		if ( document.readyState === "complete" ||
-			( document.readyState !== "loading" && !document.documentElement.doScroll ) ) {
+    /*
+		var drs = document.readyState;
+		if ( drs === "complete" ||
+			( drs !== "loading" && !document.documentElement.doScroll ) ) {
 
 			// Handle it asynchronously to allow scripts the opportunity to delay ready
 			window.setTimeout( jQuery.ready );
 
-		} else {
+		} else { */
 
 			// Use the handy event callback
-			document.addEventListener( "DOMContentLoaded", completed );
+			document[ evtListenerAdd ]( domLoaded, completed );
 
 			// A fallback to window.onload, that will always work
-			window.addEventListener( "load", completed );
-		}
+			window[ evtListenerAdd ]( "load", completed );
+
+		//}
 	}
 	return readyList.promise( obj );
 };

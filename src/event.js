@@ -4,10 +4,22 @@ define( [
 	"./var/rnotwhite",
 	"./var/slice",
 	"./data/var/dataPriv",
+	"./var/getOwnDoc",
+	"./var/getDocElem",
+	"./var/domNode",
+	"./var/domType",
+	"./var/domParent",
+	"./var/evtListenerAdd",
+	"./var/evtListenerRemove",
+	"./var/undef",
 
 	"./core/init",
 	"./selector"
-], function( jQuery, document, rnotwhite, slice, dataPriv ) {
+], function(
+	jQuery, document, rnotwhite, slice, dataPriv,
+	getDocElem, getOwnDoc, domNode, domType, domParent,
+	evtListenerAdd, evtListenerRemove, undef
+) {
 
 var
 	rkeyEvent = /^key/,
@@ -41,7 +53,7 @@ function on( elem, types, selector, data, fn, one ) {
 
 			// ( types-Object, data )
 			data = data || selector;
-			selector = undefined;
+			selector = undef;
 		}
 		for ( type in types ) {
 			on( elem, type, selector, data, types[ type ], one );
@@ -53,19 +65,19 @@ function on( elem, types, selector, data, fn, one ) {
 
 		// ( types, fn )
 		fn = selector;
-		data = selector = undefined;
+		data = selector = undef;
 	} else if ( fn == null ) {
 		if ( typeof selector === "string" ) {
 
 			// ( types, selector, fn )
 			fn = data;
-			data = undefined;
+			data = undef;
 		} else {
 
 			// ( types, data, fn )
 			fn = data;
 			data = selector;
-			selector = undefined;
+			selector = undef;
 		}
 	}
 	if ( fn === false ) {
@@ -133,7 +145,7 @@ jQuery.event = {
 				// Discard the second event of a jQuery.event.trigger() and
 				// when an event is called after a page has unloaded
 				return typeof jQuery !== "undefined" && jQuery.event.triggered !== e.type ?
-					jQuery.event.dispatch.apply( elem, arguments ) : undefined;
+					jQuery.event.dispatch.apply( elem, arguments ) : undef;
 			};
 		}
 
@@ -180,8 +192,8 @@ jQuery.event = {
 				if ( !special.setup ||
 					special.setup.call( elem, data, namespaces, eventHandle ) === false ) {
 
-					if ( elem.addEventListener ) {
-						elem.addEventListener( type, eventHandle );
+					if ( elem[ evtListenerAdd ] ) {
+						elem[ evtListenerAdd ]( type, eventHandle );
 					}
 				}
 			}
@@ -323,7 +335,7 @@ jQuery.event = {
 					ret = ( ( jQuery.event.special[ handleObj.origType ] || {} ).handle ||
 						handleObj.handler ).apply( matched.elem, args );
 
-					if ( ret !== undefined ) {
+					if ( ret !== undef ) {
 						if ( ( event.result = ret ) === false ) {
 							event.preventDefault();
 							event.stopPropagation();
@@ -353,14 +365,14 @@ jQuery.event = {
 		//
 		// Support: Firefox<=42+
 		// Avoid non-left-click in FF but don't block IE radio events (#3861, gh-2343)
-		if ( delegateCount && cur.nodeType &&
+		if ( delegateCount && cur[ domType ] &&
 			( event.type !== "click" || isNaN( event.button ) || event.button < 1 ) ) {
 
-			for ( ; cur !== this; cur = cur.parentNode || this ) {
+			for ( ; cur !== this; cur = cur[ domParent ] || this ) {
 
 				// Don't check non-elements (#13208)
 				// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
-				if ( cur.nodeType === 1 && ( cur.disabled !== true || event.type !== "click" ) ) {
+				if ( cur[ domType ] === 1 && ( cur.disabled !== true || event.type !== "click" ) ) {
 					matches = [];
 					for ( i = 0; i < delegateCount; i++ ) {
 						handleObj = handlers[ i ];
@@ -368,7 +380,7 @@ jQuery.event = {
 						// Don't conflict with Object.prototype properties (#13203)
 						sel = handleObj.selector + " ";
 
-						if ( matches[ sel ] === undefined ) {
+						if ( matches[ sel ] === undef ) {
 							matches[ sel ] = handleObj.needsContext ?
 								jQuery( sel, this ).index( cur ) > -1 :
 								jQuery.find( sel, this, null, [ cur ] ).length;
@@ -416,25 +428,26 @@ jQuery.event = {
 			"screenX screenY toElement" ).split( " " ),
 		filter: function( event, original ) {
 			var eventDoc, doc, body,
-				button = original.button;
+				button = original.button,
+				sl = "scrollLeft", st = "scrollTop", cl = "clientLeft", ct = "clientTop";
 
 			// Calculate pageX/Y if missing and clientX/Y available
 			if ( event.pageX == null && original.clientX != null ) {
-				eventDoc = event.target.ownerDocument || document;
-				doc = eventDoc.documentElement;
+				eventDoc = event.target[ getOwnDoc ] || document;
+				doc = eventDoc[ getDocElem ];
 				body = eventDoc.body;
 
 				event.pageX = original.clientX +
-					( doc && doc.scrollLeft || body && body.scrollLeft || 0 ) -
-					( doc && doc.clientLeft || body && body.clientLeft || 0 );
+					( doc && doc[ sl ] || body && body[ sl ] || 0 ) -
+					( doc && doc[ cl ] || body && body[ cl ] || 0 );
 				event.pageY = original.clientY +
-					( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) -
-					( doc && doc.clientTop  || body && body.clientTop  || 0 );
+					( doc && doc[ st ]  || body && body[ st ]  || 0 ) -
+					( doc && doc[ ct ]  || body && body[ ct ]  || 0 );
 			}
 
 			// Add which for click: 1 === left; 2 === middle; 3 === right
 			// Note: button is not normalized, so don't use it
-			if ( !event.which && button !== undefined ) {
+			if ( !event.which && button !== undef ) {
 				event.which = ( button & 1 ? 1 : ( button & 2 ? 3 : ( button & 4 ? 2 : 0 ) ) );
 			}
 
@@ -477,8 +490,8 @@ jQuery.event = {
 
 		// Support: Safari 6.0+, Chrome<28
 		// Target should not be a text node (#504, #13143)
-		if ( event.target.nodeType === 3 ) {
-			event.target = event.target.parentNode;
+		if ( event.target[ domType ] === 3 ) {
+			event.target = event.target[ domParent ];
 		}
 
 		return fixHook.filter ? fixHook.filter( event, originalEvent ) : event;
@@ -514,7 +527,10 @@ jQuery.event = {
 
 			// For checkbox, fire native event so checked state will be right
 			trigger: function() {
-				if ( this.type === "checkbox" && this.click && jQuery.nodeName( this, "input" ) ) {
+				if (
+					this.type === "checkbox" && this.click &&
+					jQuery[ domNode ]( this, "input" )
+				) {
 					this.click();
 					return false;
 				}
@@ -522,7 +538,7 @@ jQuery.event = {
 
 			// For cross-browser consistency, don't fire native .click() on links
 			_default: function( event ) {
-				return jQuery.nodeName( event.target, "a" );
+				return jQuery[ domNode ]( event.target, "a" );
 			}
 		},
 
@@ -531,7 +547,7 @@ jQuery.event = {
 
 				// Support: Firefox 20+
 				// Firefox doesn't alert if the returnValue field is not set.
-				if ( event.result !== undefined && event.originalEvent ) {
+				if ( event.result !== undef && event.originalEvent ) {
 					event.originalEvent.returnValue = event.result;
 				}
 			}
@@ -542,8 +558,8 @@ jQuery.event = {
 jQuery.removeEvent = function( elem, type, handle ) {
 
 	// This "if" is needed for plain objects
-	if ( elem.removeEventListener ) {
-		elem.removeEventListener( type, handle );
+	if ( elem[ evtListenerRemove ] ) {
+		elem[ evtListenerRemove ]( type, handle );
 	}
 };
 
@@ -562,7 +578,7 @@ jQuery.Event = function( src, props ) {
 		// Events bubbling up the document may have been marked as prevented
 		// by a handler lower down the tree; reflect the correct value.
 		this.isDefaultPrevented = src.defaultPrevented ||
-				src.defaultPrevented === undefined &&
+				src.defaultPrevented === undef &&
 
 				// Support: Android<4.0
 				src.returnValue === false ?
@@ -696,7 +712,7 @@ jQuery.fn.extend( {
 
 			// ( types [, fn] )
 			fn = selector;
-			selector = undefined;
+			selector = undef;
 		}
 		if ( fn === false ) {
 			fn = returnFalse;

@@ -31,7 +31,8 @@ jQuery.ajaxTransport( function( options ) {
 	if ( support.cors || xhrSupported && !options.crossDomain ) {
 		return {
 			send: function( headers, complete ) {
-				var i,
+				var i, tmp,
+					xrw = "X-Requested-With",
 					xhr = options.xhr();
 
 				xhr.open(
@@ -43,15 +44,15 @@ jQuery.ajaxTransport( function( options ) {
 				);
 
 				// Apply custom fields if provided
-				if ( options.xhrFields ) {
-					for ( i in options.xhrFields ) {
-						xhr[ i ] = options.xhrFields[ i ];
+				if ( tmp = options.xhrFields ) {
+					for ( i in tmp ) {
+						xhr[ i ] = tmp[ i ];
 					}
 				}
 
 				// Override mime type if needed
-				if ( options.mimeType && xhr.overrideMimeType ) {
-					xhr.overrideMimeType( options.mimeType );
+				if ( ( tmp = options.mimeType ) && xhr.overrideMimeType ) {
+					xhr.overrideMimeType( tmp );
 				}
 
 				// X-Requested-With header
@@ -59,8 +60,8 @@ jQuery.ajaxTransport( function( options ) {
 				// akin to a jigsaw puzzle, we simply never set it to be sure.
 				// (it can always be set on a per-request basis or even using ajaxSetup)
 				// For same-domain requests, won't change header if already provided.
-				if ( !options.crossDomain && !headers[ "X-Requested-With" ] ) {
-					headers[ "X-Requested-With" ] = "XMLHttpRequest";
+				if ( !options.crossDomain && !headers[ xrw ] ) {
+					headers[ xrw ] = "XMLHttpRequest";
 				}
 
 				// Set headers

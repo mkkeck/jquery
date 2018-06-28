@@ -1,9 +1,13 @@
 define( [
 	"./core",
+	"./var/getOwnDoc",
+	"./var/domNode",
+	"./var/domParent",
+
 	"./core/init",
 	"./manipulation", // clone
 	"./traversing" // parent, contents
-], function( jQuery ) {
+], function( jQuery, getOwnDoc, domNode, domParent ) {
 
 jQuery.fn.extend( {
 	wrapAll: function( html ) {
@@ -18,17 +22,17 @@ jQuery.fn.extend( {
 		if ( this[ 0 ] ) {
 
 			// The elements to wrap the target around
-			wrap = jQuery( html, this[ 0 ].ownerDocument ).eq( 0 ).clone( true );
+			wrap = jQuery( html, this[ 0 ][ getOwnDoc ] ).eq( 0 ).clone( true );
 
-			if ( this[ 0 ].parentNode ) {
+			if ( this[ 0 ][ domParent ] ) {
 				wrap.insertBefore( this[ 0 ] );
 			}
 
 			wrap.map( function() {
-				var elem = this;
+				var elem = this, fec = "firstElementChild";
 
-				while ( elem.firstElementChild ) {
-					elem = elem.firstElementChild;
+				while ( elem[ fec ] ) {
+					elem = elem[ fec ];
 				}
 
 				return elem;
@@ -68,7 +72,7 @@ jQuery.fn.extend( {
 
 	unwrap: function() {
 		return this.parent().each( function() {
-			if ( !jQuery.nodeName( this, "body" ) ) {
+			if ( !jQuery[ domNode ]( this, "body" ) ) {
 				jQuery( this ).replaceWith( this.childNodes );
 			}
 		} ).end();
