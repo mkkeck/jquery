@@ -11,13 +11,14 @@ define( [
 	"./var/support",
 	"./var/createElem",
 	"./var/strlower",
+  "./var/strreplace",
   "./var/domNode",
   "./var/domType",
   "./var/domParent",
   "./var/undef"
 ], function(
 	arr, document, slice, concat, push, indexOf, class2type, toString, hasOwn,
-	support, createElem, strlower, domNode, domType, domParent, undef
+	support, createElem, strlower, strreplace, domNode, domType, domParent, undef
 ) {
 
 var
@@ -79,11 +80,12 @@ jQuery.fn = jQuery.prototype = {
 	pushStack: function( elems ) {
 
 		// Build a new jQuery matched element set
-		var ret = jQuery.merge( this.constructor(), elems );
+		var t = this,
+			ret = jQuery.merge( t.constructor(), elems );
 
 		// Add the old object onto the stack (as a reference)
-		ret.prevObject = this;
-		ret.context = this.context;
+		ret.prevObject = t;
+		ret.context = t.context;
 
 		// Return the newly-formed element set
 		return ret;
@@ -113,9 +115,9 @@ jQuery.fn = jQuery.prototype = {
 	},
 
 	eq: function( i ) {
-		var len = this.length,
+		var t = this, len = t.length,
 			j = +i + ( i < 0 ? len : 0 );
-		return this.pushStack( j >= 0 && j < len ? [ this[ j ] ] : [] );
+		return t.pushStack( j >= 0 && j < len ? [ t[ j ] ] : [] );
 	},
 
 	end: function() {
@@ -202,7 +204,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 jQuery.extend( {
 
 	// Unique for each copy of jQuery on the page
-	expando: "jQuery" + ( version + Math.random() ).replace( /\D/g, "" ),
+	expando: "jQuery" + strreplace( ( version + Math.random() ), /\D/g, "" ),
 
 	// Assume jQuery is ready without the ready module
 	isReady: true,
@@ -307,7 +309,7 @@ jQuery.extend( {
 	// Support: IE9-11+
 	// Microsoft forgot to hump their vendor prefix (#9572)
 	camelCase: function( string ) {
-		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
+		return strreplace( strreplace( string, rmsPrefix, "ms-" ), rdashAlpha, fcamelCase );
 	},
 
 	nodeName: function( elem, name ) {
@@ -340,7 +342,7 @@ jQuery.extend( {
 	trim: function( text ) {
 		return text == null ?
 			"" :
-			( text + "" ).replace( rtrim, "" );
+			strreplace( text + "", rtrim, "" );
 	},
 
 	// results is for internal usage only

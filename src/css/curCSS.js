@@ -11,7 +11,9 @@ define( [
 
 function curCSS( elem, name, computed ) {
 	var width, minWidth, maxWidth, ret,
-		style = elem.style;
+		style = elem.style,
+		maxW = "maxWidth",
+		minW = "minWidth";
 
 	computed = computed || getStyles( elem );
 	ret = computed ? computed.getPropertyValue( name ) || computed[ name ] : undef;
@@ -36,17 +38,17 @@ function curCSS( elem, name, computed ) {
 
 			// Remember the original values
 			width = style.width;
-			minWidth = style.minWidth;
-			maxWidth = style.maxWidth;
+			minWidth = style[ minW ];
+			maxWidth = style[ maxW ];
 
 			// Put in the new values to get a computed value out
-			style.minWidth = style.maxWidth = style.width = ret;
+			style[ minW ] = style[ maxW ] = style.width = ret;
 			ret = computed.width;
 
 			// Revert the changed values
 			style.width = width;
-			style.minWidth = minWidth;
-			style.maxWidth = maxWidth;
+			style[ minW ] = minWidth;
+			style[ maxW ] = maxWidth;
 		}
 	}
 

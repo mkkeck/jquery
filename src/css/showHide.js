@@ -7,6 +7,7 @@ function showHide( elements, show ) {
 		values = [],
 		index = 0,
 		none = "none",
+		attr = "display",
 		length = elements.length;
 
 	// Determine new display value for elements that need to change
@@ -16,19 +17,19 @@ function showHide( elements, show ) {
 			continue;
 		}
 
-		display = elem.style.display;
+		display = elem.style[ attr ];
 		if ( show ) {
 			if ( display === none ) {
 
 				// Restore a pre-hide() value if we have one
-				values[ index ] = dataPriv.get( elem, "display" ) || "";
+				values[ index ] = dataPriv.get( elem, attr ) || "";
 			}
 		} else {
 			if ( display !== none ) {
 				values[ index ] = none;
 
 				// Remember the value we're replacing
-				dataPriv.set( elem, "display", display );
+				dataPriv.set( elem, attr, display );
 			}
 		}
 	}
@@ -37,7 +38,7 @@ function showHide( elements, show ) {
 	// to avoid the constant reflow
 	for ( index = 0; index < length; index++ ) {
 		if ( values[ index ] != null ) {
-			elements[ index ].style.display = values[ index ];
+			elements[ index ].style[ attr ] = values[ index ];
 		}
 	}
 

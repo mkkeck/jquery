@@ -6,9 +6,10 @@ define( [
 	"./var/getAttr",
 	"./var/domType",
 	"./var/strlower",
+	"./var/strreplace",
 	"./var/undef"
 ], function(
-	jQuery, access, dataPriv, dataUser, getAttr, domType, strlower, undef
+	jQuery, access, dataPriv, dataUser, getAttr, domType, strlower, strreplace, undef
 ) {
 
 //	Implementation Summary
@@ -30,7 +31,7 @@ function dataAttr( elem, key, data ) {
 	// If nothing was found internally, try to fetch any
 	// data from the HTML5 data-* attribute
 	if ( data === undef && elem[ domType ] === 1 ) {
-		name = "data-" + strlower( key.replace( rmultiDash, "-$&" ) );
+		name = "data-" + strlower( strreplace( key, rmultiDash, "-$&" ) );
 		data = elem[ getAttr ]( name );
 
 		if ( typeof data === "string" ) {
@@ -134,7 +135,7 @@ jQuery.fn.extend( {
 
 					// Try to find dashed key if it exists (gh-2779)
 					// This is for 2.2.x only
-					dataUser.get( elem, strlower( key.replace( rmultiDash, "-$&" ) ) );
+					dataUser.get( elem, strlower( strreplace( key, rmultiDash, "-$&" ) ) );
 
 				if ( data !== undef ) {
 					return data;

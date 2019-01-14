@@ -2,10 +2,11 @@ define( [
 	"../core",
 	"./var/nonce",
 	"./var/rquery",
+	"../var/strreplace",
 	"../var/undef",
 
 	"../ajax"
-], function( jQuery, nonce, rquery, undef ) {
+], function( jQuery, nonce, rquery, strreplace, undef ) {
 
 var oldCallbacks = [],
 	rjsonp = /(=)\?(?=&|$)|\?\?/;
@@ -43,7 +44,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 
 		// Insert callback into url or form data
 		if ( jsonProp ) {
-			s[ jsonProp ] = s[ jsonProp ].replace( rjsonp, "$1" + callbackName );
+			s[ jsonProp ] = strreplace( s[ jsonProp ], rjsonp, "$1" + callbackName );
 		} else if ( s.jsonp !== false ) {
 			s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s.jsonp + "=" + callbackName;
 		}

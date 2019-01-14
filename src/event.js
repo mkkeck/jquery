@@ -11,6 +11,7 @@ define( [
 	"./var/domParent",
 	"./var/evtListenerAdd",
 	"./var/evtListenerRemove",
+  "./var/notdef",
 	"./var/undef",
 
 	"./core/init",
@@ -18,7 +19,7 @@ define( [
 ], function(
 	jQuery, document, rnotwhite, slice, dataPriv,
 	getDocElem, getOwnDoc, domNode, domType, domParent,
-	evtListenerAdd, evtListenerRemove, undef
+	evtListenerAdd, evtListenerRemove, notdef, undef
 ) {
 
 var
@@ -144,7 +145,7 @@ jQuery.event = {
 
 				// Discard the second event of a jQuery.event.trigger() and
 				// when an event is called after a page has unloaded
-				return typeof jQuery !== "undefined" && jQuery.event.triggered !== e.type ?
+				return typeof jQuery !== notdef && jQuery.event.triggered !== e.type ?
 					jQuery.event.dispatch.apply( elem, arguments ) : undef;
 			};
 		}
@@ -621,24 +622,24 @@ jQuery.Event.prototype = {
 		}
 	},
 	stopPropagation: function() {
-		var e = this.originalEvent;
+		var t = this, e = t.originalEvent;
 
-		this.isPropagationStopped = returnTrue;
+		t.isPropagationStopped = returnTrue;
 
-		if ( e && !this.isSimulated ) {
+		if ( e && !t.isSimulated ) {
 			e.stopPropagation();
 		}
 	},
 	stopImmediatePropagation: function() {
-		var e = this.originalEvent;
+		var t = this, e = t.originalEvent;
 
-		this.isImmediatePropagationStopped = returnTrue;
+		t.isImmediatePropagationStopped = returnTrue;
 
-		if ( e && !this.isSimulated ) {
+		if ( e && !t.isSimulated ) {
 			e.stopImmediatePropagation();
 		}
 
-		this.stopPropagation();
+		t.stopPropagation();
 	}
 };
 
@@ -686,7 +687,7 @@ jQuery.fn.extend( {
 		return on( this, types, selector, data, fn, 1 );
 	},
 	off: function( types, selector, fn ) {
-		var handleObj, type;
+		var handleObj, type, t = this;
 		if ( types && types.preventDefault && types.handleObj ) {
 
 			// ( event )  dispatched jQuery.Event
@@ -698,15 +699,15 @@ jQuery.fn.extend( {
 				handleObj.selector,
 				handleObj.handler
 			);
-			return this;
+			return t;
 		}
 		if ( typeof types === "object" ) {
 
 			// ( types-object [, selector] )
 			for ( type in types ) {
-				this.off( type, selector, types[ type ] );
+				t.off( type, selector, types[ type ] );
 			}
-			return this;
+			return t;
 		}
 		if ( selector === false || typeof selector === "function" ) {
 
@@ -717,7 +718,7 @@ jQuery.fn.extend( {
 		if ( fn === false ) {
 			fn = returnFalse;
 		}
-		return this.each( function() {
+		return t.each( function() {
 			jQuery.event.remove( this, types, fn, selector );
 		} );
 	}

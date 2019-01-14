@@ -107,7 +107,7 @@ if ( !support.optSelected ) {
 			if ( parent ) {
 				parent.selectedIndex;
 
-				if ( grandpa = parent[ domParent ] ) {
+				if ( ( grandpa = parent[ domParent ] ) ) {
 					grandpa.selectedIndex;
 				}
 			}

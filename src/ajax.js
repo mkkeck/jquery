@@ -8,6 +8,7 @@ define( [
 	"./var/createElem",
 	"./var/domType",
 	"./var/strlower",
+	"./var/strreplace",
 	"./var/undef",
 
 	"./core/init",
@@ -17,7 +18,7 @@ define( [
 	"./deferred"
 ], function(
 	jQuery, document, rnotwhite, location, nonce, rquery,
-	createElem, domType, strlower, undef
+	createElem, domType, strlower, strreplace, undef
 ) {
 
 var
@@ -216,7 +217,7 @@ function ajaxConvert( s, response, jqXHR, isSuccess ) {
 	// Convert to each sequential dataType
 	while ( current ) {
 
-		if ( tmp = s.responseFields[ current ] ) {
+		if ( ( tmp = s.responseFields[ current ] ) ) {
 			jqXHR[ tmp ] = response;
 		}
 
@@ -533,8 +534,10 @@ jQuery.extend( {
 		// Add protocol if not provided (prefilters might expect it)
 		// Handle falsy url in the settings object (#10093: consistency with old signature)
 		// We also use the url parameter if available
-		s.url = ( ( url || s.url || location.href ) + "" ).replace( rhash, "" )
-			.replace( rprotocol, location.protocol + "//" );
+		s.url = strreplace(
+		  strreplace( ( url || s.url || location.href ) + "", rhash, "" ),
+			rprotocol, location.protocol + "//"
+		);
 
 		// Alias method option to type as per ticket #12004
 		s.type = options.method || options.type || s.method || s.type;
@@ -612,7 +615,7 @@ jQuery.extend( {
 				s.url = rts.test( cacheURL ) ?
 
 					// If there is already a '_' parameter, set its value
-					cacheURL.replace( rts, "$1_=" + nonce++ ) :
+					strreplace( cacheURL, rts, "$1_=" + nonce++ ) :
 
 					// Otherwise add one to the end
 					cacheURL + ( rquery.test( cacheURL ) ? "&" : "?" ) + "_=" + nonce++;
@@ -621,10 +624,10 @@ jQuery.extend( {
 
 		// Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
 		if ( s.ifModified ) {
-			if ( temp = jQuery.lastModified[ cacheURL ] ) {
+			if ( ( temp = jQuery.lastModified[ cacheURL ] ) ) {
 				jqXHR[ setReqHeader ]( "If-Modified-Since", temp );
 			}
-			if ( temp = jQuery.etag[ cacheURL ] ) {
+			if ( ( temp = jQuery.etag[ cacheURL ] ) ) {
 				jqXHR[ setReqHeader ]( "If-None-Match", temp );
 			}
 		}
@@ -750,12 +753,10 @@ jQuery.extend( {
 
 				// Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
 				if ( s.ifModified ) {
-					modified = jqXHR.getResponseHeader( "Last-Modified" );
-					if ( modified ) {
+					if ( ( modified = jqXHR.getResponseHeader( "Last-Modified" ) ) ) {
 						jQuery.lastModified[ cacheURL ] = modified;
 					}
-					modified = jqXHR.getResponseHeader( "etag" );
-					if ( modified ) {
+					if ( ( modified = jqXHR.getResponseHeader( "etag" ) ) ) {
 						jQuery.etag[ cacheURL ] = modified;
 					}
 				}

@@ -1,5 +1,5 @@
 define( function( ) {
-	return function strlower( s ) {
-		return ( s + "" ).toLowerCase();
+	return function strlower( str ) {
+		return ( "" + str ).toLowerCase();
 	};
 } );

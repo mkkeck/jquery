@@ -2,11 +2,12 @@ define( [
 	"./core",
 	"./manipulation/var/rcheckableType",
 	"./var/domNode",
+	"./var/strreplace",
 
 	"./core/init",
 	"./traversing", // filter
 	"./attributes/prop"
-], function( jQuery, rcheckableType, domNode ) {
+], function( jQuery, rcheckableType, domNode, strreplace ) {
 
 var r20 = /%20/g,
 	rbracket = /\[\]$/,
@@ -88,7 +89,7 @@ jQuery.param = function( a, traditional ) {
 	}
 
 	// Return the resulting serialization
-	return s.join( "&" ).replace( r20, "+" );
+	return strreplace( s.join( "&" ), r20, "+" );
 };
 
 jQuery.fn.extend( {
@@ -103,12 +104,12 @@ jQuery.fn.extend( {
 			return elements ? jQuery.makeArray( elements ) : this;
 		} )
 		.filter( function() {
-			var type = this.type;
+			var t = this, type = t.type;
 
 			// Use .is( ":disabled" ) so that fieldset[disabled] works
-			return this.name && !jQuery( this ).is( ":disabled" ) &&
-				rsubmittable.test( this[ domNode ] ) && !rsubmitterTypes.test( type ) &&
-				( this.checked || !rcheckableType.test( type ) );
+			return t.name && !jQuery( t ).is( ":disabled" ) &&
+				rsubmittable.test( t[ domNode ] ) && !rsubmitterTypes.test( type ) &&
+				( t.checked || !rcheckableType.test( type ) );
 		} )
 		.map( function( i, elem ) {
 			var val = jQuery( this ).val();
@@ -117,9 +118,9 @@ jQuery.fn.extend( {
 				null :
 				jQuery.isArray( val ) ?
 					jQuery.map( val, function( val ) {
-						return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+						return { name: elem.name, value: strreplace( val, rCRLF, "\r\n" ) };
 					} ) :
-					{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+					{ name: elem.name, value: strreplace( val, rCRLF, "\r\n" ) };
 		} ).get();
 	}
 } );

@@ -127,7 +127,7 @@ function defaultPrefilter( elem, props, opts ) {
 		}
 	}
 
-	if ( tmp = opts[ ovfl ] ) {
+	if ( ( tmp = opts[ ovfl ] ) ) {
 		style[ ovfl ] = "hidden";
 		anim.always( function() {
 			style[ ovfl ] = tmp[ 0 ];

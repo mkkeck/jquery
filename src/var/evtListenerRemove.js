@@ -1,5 +1,6 @@
 define( [
+  "./strreplace",
 	"./evtListenerAdd"
-],  function( evtListenerAdd ) {
-	return evtListenerAdd.replace( /^add/, "remove" );
+],  function( strreplace, evtListenerAdd ) {
+	return strreplace( evtListenerAdd, /^add/, "remove" );
 } );

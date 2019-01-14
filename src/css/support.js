@@ -9,7 +9,8 @@ define( [
 ( function() {
 	var pixelPositionVal, boxSizingReliableVal, pixelMarginRightVal, reliableMarginLeftVal,
 		container = createElem( "div", document ),
-		div = createElem( "div", document );
+		div = createElem( "div", document ),
+		bgc = "backgroundClip";
 
 	// Finish early in limited (non-browser) environments
 	if ( !div.style ) {
@@ -18,9 +19,9 @@ define( [
 
 	// Support: IE9-11+
 	// Style of cloned element affects source element cloned (#8908)
-	div.style.backgroundClip = "content-box";
-	div.cloneNode( true ).style.backgroundClip = "";
-	support.clearCloneStyle = div.style.backgroundClip === "content-box";
+	div.style[ bgc ] = "content-box";
+	div.cloneNode( true ).style[ bgc ] = "";
+	support.clearCloneStyle = div.style[ bgc ] === "content-box";
 
 	container.style.cssText = "border:0;width:8px;height:0;top:0;left:-9999px;" +
 		"padding:0;margin-top:1px;position:absolute";
@@ -33,7 +34,7 @@ define( [
 
 			// Support: Firefox<29, Android 2.3
 			// Vendor-prefix box-sizing
-			//"-webkit-box-sizing:border-box;-moz-box-sizing:border-box;" +
+			"-webkit-box-sizing:border-box;" + //-moz-box-sizing:border-box;" +
 			"box-sizing:border-box;" +
 			"position:relative;display:block;" +
 			"margin:auto;border:1px;padding:1px;" +

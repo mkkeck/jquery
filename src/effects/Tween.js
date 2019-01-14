@@ -37,7 +37,7 @@ Tween.prototype = {
 			options = this.options,
 			hooks = propHooks[ this.prop ];
 
-		if ( dur = options.duration ) {
+		if ( ( dur = options.duration ) ) {
 			this.pos = eased = jQuery.easing[ this.easing ](
 				percent, dur * percent, 0, 1, dur
 			);

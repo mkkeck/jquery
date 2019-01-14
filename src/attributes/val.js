@@ -2,6 +2,7 @@ define( [
 	"../core",
 	"./support",
 	"../var/strlower",
+  "../var/strreplace",
 	"../var/getAttr",
 	"../var/domNode",
 	"../var/domType",
@@ -9,7 +10,7 @@ define( [
 	"../var/undef",
 
 	"../core/init"
-], function( jQuery, support, strlower, getAttr, domNode, domType, domParent, undef ) {
+], function( jQuery, support, strlower, strreplace, getAttr, domNode, domType, domParent, undef ) {
 
 var rreturn = /\r/g,
 	rspaces = /[\x20\t\r\n\f]+/g;
@@ -37,7 +38,7 @@ jQuery.fn.extend( {
 				return typeof ret === "string" ?
 
 					// Handle most common string cases
-					ret.replace( rreturn, "" ) :
+					strreplace( ret, rreturn, "" ) :
 
 					// Handle cases where value is null/undef or number
 					ret == null ? "" : ret;
@@ -49,14 +50,14 @@ jQuery.fn.extend( {
 		isFunction = jQuery.isFunction( value );
 
 		return this.each( function( i ) {
-			var val, valHooks = jQuery.valHooks;
+			var val, valHooks = jQuery.valHooks, t = this;
 
-			if ( this[ domType ] !== 1 ) {
+			if ( t[ domType ] !== 1 ) {
 				return;
 			}
 
 			if ( isFunction ) {
-				val = value.call( this, i, jQuery( this ).val() );
+				val = value.call( t, i, jQuery( t ).val() );
 			} else {
 				val = value;
 			}
@@ -74,11 +75,11 @@ jQuery.fn.extend( {
 				} );
 			}
 
-			hooks = valHooks[ this.type ] || valHooks[ strlower( this[ domNode ] ) ];
+			hooks = valHooks[ t.type ] || valHooks[ strlower( t[ domNode ] ) ];
 
 			// If set returns undefined, fall back to normal setting
-			if ( !hooks || !( "set" in hooks ) || hooks.set( this, val, "value" ) === undef ) {
-				this.value = val;
+			if ( !hooks || !( "set" in hooks ) || hooks.set( t, val, "value" ) === undef ) {
+				t.value = val;
 			}
 		} );
 	}
@@ -97,7 +98,7 @@ jQuery.extend( {
 					// option.text throws exceptions (#14686, #14858)
 					// Strip and collapse whitespace
 					// https://html.spec.whatwg.org/#strip-and-collapse-whitespace
-					jQuery.trim( jQuery.text( elem ) ).replace( rspaces, " " );
+					strreplace( jQuery.trim( jQuery.text( elem ) ), rspaces, " " );
 			}
 		},
 		select: {
@@ -149,9 +150,9 @@ jQuery.extend( {
 
 				while ( i-- ) {
 					option = options[ i ];
-					if ( option.selected =
+					if ( ( option.selected =
 						jQuery.inArray( jQuery.valHooks.option.get( option ), values ) > -1
-					) {
+					) ) {
 						optionSet = true;
 					}
 				}

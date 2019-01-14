@@ -11,10 +11,11 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 			function() { return tween.cur(); } :
 			function() { return jQuery.css( elem, prop, "" ); },
 		initial = currentValue(),
-		unit = valueParts && valueParts[ 3 ] || ( jQuery.cssNumber[ prop ] ? "" : "px" ),
+		cssnum = jQuery.cssNumber,
+		unit = valueParts && valueParts[ 3 ] || ( cssnum[ prop ] ? "" : "px" ),
 
 		// Starting value computation is required for potential unit mismatches
-		initialInUnit = ( jQuery.cssNumber[ prop ] || unit !== "px" && +initial ) &&
+		initialInUnit = ( cssnum[ prop ] || unit !== "px" && +initial ) &&
 			rcssNum.exec( jQuery.css( elem, prop ) );
 
 	if ( initialInUnit && initialInUnit[ 3 ] !== unit ) {

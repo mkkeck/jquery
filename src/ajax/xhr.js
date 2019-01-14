@@ -44,7 +44,7 @@ jQuery.ajaxTransport( function( options ) {
 				);
 
 				// Apply custom fields if provided
-				if ( tmp = options.xhrFields ) {
+				if ( ( tmp = options.xhrFields ) ) {
 					for ( i in tmp ) {
 						xhr[ i ] = tmp[ i ];
 					}

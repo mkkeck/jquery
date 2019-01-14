@@ -82,7 +82,6 @@ jQuery.ready.promise = function( obj ) {
 		// after the browser event has already occurred.
 		// Support: IE9-10 only
 		// Older IE sometimes signals "interactive" too soon
-    /*
 		var drs = document.readyState;
 		if ( drs === "complete" ||
 			( drs !== "loading" && !document.documentElement.doScroll ) ) {
@@ -90,7 +89,7 @@ jQuery.ready.promise = function( obj ) {
 			// Handle it asynchronously to allow scripts the opportunity to delay ready
 			window.setTimeout( jQuery.ready );
 
-		} else { */
+		} else {
 
 			// Use the handy event callback
 			document[ evtListenerAdd ]( domLoaded, completed );
@@ -98,7 +97,7 @@ jQuery.ready.promise = function( obj ) {
 			// A fallback to window.onload, that will always work
 			window[ evtListenerAdd ]( "load", completed );
 
-		//}
+		}
 	}
 	return readyList.promise( obj );
 };

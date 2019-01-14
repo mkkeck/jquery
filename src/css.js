@@ -174,26 +174,27 @@ function showHide( elements, show ) {
 	var display, elem, hidden, style,
 		values = [],
 		index = 0,
+		attr = "display",
 		oldd = "olddisplay", none = "none",
 		length = elements.length;
 
 	for ( ; index < length; index++ ) {
 		elem = elements[ index ];
-		if ( style = elem.style ) {
+		if ( ( style = elem.style ) ) {
 			values[ index ] = dataPriv.get( elem, oldd );
-			display = style.display;
+			display = style[ attr ];
 			if ( show ) {
 
 				// Reset the inline display of this element to learn if it is
 				// being hidden by cascaded rules or not
 				if ( !values[ index ] && display === none ) {
-					style.display = "";
+					style[ attr ] = "";
 				}
 
 				// Set elements which have been overridden with display: none
 				// in a stylesheet to whatever the default browser style is
 				// for such an element
-				if ( style.display === "" && isHidden( elem ) ) {
+				if ( style[ attr ] === "" && isHidden( elem ) ) {
 					values[ index ] = dataPriv.access(
 						elem,
 						oldd,
@@ -207,7 +208,7 @@ function showHide( elements, show ) {
 					dataPriv.set(
 						elem,
 						oldd,
-						hidden ? display : jQuery.css( elem, "display" )
+						hidden ? display : jQuery.css( elem, attr )
 					);
 				}
 			}
@@ -218,9 +219,9 @@ function showHide( elements, show ) {
 	// to avoid the constant reflow
 	for ( index = 0; index < length; index++ ) {
 		elem = elements[ index ];
-		if ( style = elem.style ) {
-			if ( !show || style.display === none || style.display === "" ) {
-				style.display = show ? values[ index ] || "" : none;
+		if ( ( style = elem.style ) ) {
+			if ( !show || style[ attr ] === none || style[ attr ] === "" ) {
+				style[ attr ] = show ? values[ index ] || "" : none;
 			}
 		}
 
@@ -504,11 +505,7 @@ jQuery.fn.extend( {
 		}
 
 		return this.each( function() {
-			if ( isHidden( this ) ) {
-				jQuery( this ).show();
-			} else {
-				jQuery( this ).hide();
-			}
+			jQuery( this )[ isHidden( this ) ? "show" : "hide" ]();
 		} );
 	}
 } );

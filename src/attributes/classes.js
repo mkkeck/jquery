@@ -2,13 +2,14 @@ define( [
 	"../core",
 	"../var/rnotwhite",
 	"../data/var/dataPriv",
+  "../var/strreplace",
 	"../var/getAttr",
 	"../var/setAttr",
 	"../var/domType",
 	"../var/undef",
 
 	"../core/init"
-], function( jQuery, rnotwhite, dataPriv, getAttr, setAttr, domType, undef ) {
+], function( jQuery, rnotwhite, dataPriv, strreplace, getAttr, setAttr, domType, undef ) {
 
 var rclass = /[\t\r\n\f]/g;
 
@@ -33,7 +34,7 @@ jQuery.fn.extend( {
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
 				cur = elem[ domType ] === 1 &&
-					( " " + curValue + " " ).replace( rclass, " " );
+					strreplace( " " + curValue + " ", rclass, " " );
 
 				if ( cur ) {
 					j = 0;
@@ -77,7 +78,7 @@ jQuery.fn.extend( {
 
 				// This expression is here for better compressibility (see addClass)
 				cur = elem[ domType ] === 1 &&
-					( " " + curValue + " " ).replace( rclass, " " );
+					strreplace( " " + curValue + " ", rclass, " " );
 
 				if ( cur ) {
 					j = 0;
@@ -85,7 +86,7 @@ jQuery.fn.extend( {
 
 						// Remove *all* instances
 						while ( cur.indexOf( " " + clazz + " " ) > -1 ) {
-							cur = cur.replace( " " + clazz + " ", " " );
+							cur = strreplace( cur, " " + clazz + " ", " " );
 						}
 					}
 
@@ -119,43 +120,42 @@ jQuery.fn.extend( {
 
 		return this.each( function() {
 			var className, i, self, classNames,
-				classPriv = "__className__";
+				classPriv = "__className__",
+				t = this;
 
 			if ( type === "string" ) {
 
 				// Toggle individual class names
 				i = 0;
-				self = jQuery( this );
+				self = jQuery( t );
 				classNames = value.match( rnotwhite ) || [];
 
 				while ( ( className = classNames[ i++ ] ) ) {
 
 					// Check each className given, space separated list
-					if ( self.hasClass( className ) ) {
-						self.removeClass( className );
-					} else {
-						self.addClass( className );
-					}
+					self[ (
+						self.hasClass( className ) ? "remove" : "add"
+					)  + "Class" ]( className );
 				}
 
 			// Toggle whole class name
 			} else if ( value === undef || type === "boolean" ) {
-				className = getClass( this );
+				className = getClass( t );
 				if ( className ) {
 
 					// Store className if set
-					dataPriv.set( this, classPriv, className );
+					dataPriv.set( t, classPriv, className );
 				}
 
 				// If the element has a class name or if we're passed `false`,
 				// then remove the whole classname (if there was one, the above saved it).
 				// Otherwise bring back whatever was previously saved (if anything),
 				// falling back to the empty string if nothing was stored.
-				if ( this[ setAttr ] ) {
-					this[ setAttr ]( "class",
+				if ( t[ setAttr ] ) {
+					t[ setAttr ]( "class",
 						className || value === false ?
 						"" :
-						dataPriv.get( this, classPriv ) || ""
+						dataPriv.get( t, classPriv ) || ""
 					);
 				}
 			}
@@ -169,7 +169,7 @@ jQuery.fn.extend( {
 		className = " " + selector + " ";
 		while ( ( elem = this[ i++ ] ) ) {
 			if ( elem[ domType ] === 1 &&
-				( " " + getClass( elem ) + " " ).replace( rclass, " " )
+				strreplace( " " + getClass( elem ) + " ", rclass, " " )
 					.indexOf( className ) > -1
 			) {
 				return true;

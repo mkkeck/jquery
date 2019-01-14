@@ -8,12 +8,13 @@ define( [
 	"../var/setAttr",
 	"../var/domNode",
 	"../var/domType",
+	"../var/notdef",
 	"../var/undef",
 
 	"../selector"
 ], function(
 	jQuery, access, support, rnotwhite,
-	strlower, getAttr, setAttr, domNode, domType, undef
+	strlower, getAttr, setAttr, domNode, domType, notdef, undef
 ) {
 
 var boolHook,
@@ -42,7 +43,7 @@ jQuery.extend( {
 		}
 
 		// Fallback to prop when attributes are not supported
-		if ( typeof elem[ getAttr ] === "undefined" ) {
+		if ( typeof elem[ getAttr ] === notdef ) {
 			return jQuery.prop( elem, name, value );
 		}
 

@@ -1,10 +1,12 @@
 define( [
 	"./core",
-	"./var/arr",
-	"./var/push",
-	"./var/slice",
+
+//	"./var/arr",
+//	"./var/push",
+//	"./var/slice",
 	"./var/rinputs",
 	"./var/strlower",
+	"./var/strreplace",
 	"./var/createElem",
 	"./var/getElem",
 	"./var/getById",
@@ -19,13 +21,18 @@ define( [
 	"./var/domNext",
 	"./var/domPrev",
 	"./var/evtListenerAdd",
+	"./var/notdef",
+	"./var/undef",
 
 	"../external/sizzle/dist/sizzle"
 ], function(
-	jQuery, arr, push, slice, rinputs,
-	strlower, createElem, getElem, getById, getByTag, getOwnDoc, getDocElem,
+	jQuery,
+
+  // arr, push, slice, rinputs,
+
+	strlower, strreplace, createElem, getElem, getById, getByTag, getOwnDoc, getDocElem,
 	getAttr, setAttr, domNode, domType, domParent, domNext, domPrev,
-	evtListenerAdd, Sizzle
+	evtListenerAdd, notdef, undef, Sizzle
 ) {
 
 jQuery.find = Sizzle;
