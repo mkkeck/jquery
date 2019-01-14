@@ -18,6 +18,7 @@ define( [
 
 	"./var/createElem",
 	"./var/strlower",
+	"./var/strreplace",
 	"./var/getByTag",
 	"./var/getOwnDoc",
 	"./var/getAttr",
@@ -34,7 +35,7 @@ define( [
 ], function(
 	jQuery, concat, push, access, rcheckableType, rtagName, rscriptType,
 	wrapMap, getAll, setGlobalEval, buildFragment, support, dataPriv, dataUser, acceptData,
-	createElem, strlower, getByTag, getOwnDoc, getAttr, domNode, domType,
+	createElem, strlower, strreplace, getByTag, getOwnDoc, getAttr, domNode, domType,
 	domParent, domNext, undef
 ) {
 
@@ -209,7 +210,7 @@ function domManip( collection, args, callback, ignored ) {
 								jQuery._evalUrl( node.src );
 							}
 						} else {
-							jQuery.globalEval( node.textContent.replace( rcleanScript, "" ) );
+							jQuery.globalEval( strreplace( node.textContent, rcleanScript, "" ) );
 						}
 					}
 				}
@@ -243,7 +244,7 @@ function remove( elem, selector, keepData ) {
 
 jQuery.extend( {
 	htmlPrefilter: function( html ) {
-		return html.replace( rxhtmlTag, "<$1></$2>" );
+		return strreplace( html, rxhtmlTag, "<$1></$2>" );
 	},
 
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
@@ -375,7 +376,7 @@ jQuery.fn.extend( {
 	before: function() {
 		return domManip( this, arguments, function( elem ) {
 			var parent;
-			if ( parent = this[ domParent ] ) {
+			if ( ( parent = this[ domParent ] ) ) {
 				parent.insertBefore( elem, this );
 			}
 		} );
@@ -384,7 +385,7 @@ jQuery.fn.extend( {
 	after: function() {
 		return domManip( this, arguments, function( elem ) {
 			var parent;
-			if ( parent = this[ domParent ] ) {
+			if ( ( parent = this[ domParent ] ) ) {
 				parent.insertBefore( elem, this[ domNext ] );
 			}
 		} );
@@ -419,9 +420,9 @@ jQuery.fn.extend( {
 
 	html: function( value ) {
 		return access( this, function( value ) {
-			var elem = this[ 0 ] || {},
+			var t = this, elem = t[ 0 ] || {},
 				i = 0,
-				l = this.length,
+				l = t.length,
 				iH = "innerHTML";
 
 			if ( value === undef && elem[ domType ] === 1 ) {
@@ -436,7 +437,7 @@ jQuery.fn.extend( {
 
 				try {
 					for ( ; i < l; i++ ) {
-						elem = this[ i ] || {};
+						elem = t[ i ] || {};
 
 						// Remove element nodes and prevent memory leaks
 						if ( elem[ domType ] === 1 ) {
@@ -452,7 +453,7 @@ jQuery.fn.extend( {
 			}
 
 			if ( elem ) {
-				this.empty().append( value );
+				t.empty().append( value );
 			}
 		}, null, value, arguments.length );
 	},
@@ -462,12 +463,12 @@ jQuery.fn.extend( {
 
 		// Make the changes, replacing each non-ignored context element with the new content
 		return domManip( this, arguments, function( elem ) {
-			var parent = this[ domParent ];
+			var t = this, parent = t[ domParent ];
 
-			if ( jQuery.inArray( this, ignored ) < 0 ) {
-				jQuery.cleanData( getAll( this ) );
+			if ( jQuery.inArray( t, ignored ) < 0 ) {
+				jQuery.cleanData( getAll( t ) );
 				if ( parent ) {
-					parent.replaceChild( elem, this );
+					parent.replaceChild( elem, t );
 				}
 			}
 
