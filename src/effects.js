@@ -75,6 +75,7 @@ function defaultPrefilter( elem, props, opts ) {
 		anim = this,
 		ovfl = "overflow", ovflX = ovfl + "X", ovflY = ovfl + "Y",
 		orig = {},
+    unqueued = "unqueued",
 		style = elem.style,
 		hidden = elem[ domType ] && isHidden( elem ),
 		dataShow = dataPriv.get( elem, "fxshow" );
@@ -82,22 +83,22 @@ function defaultPrefilter( elem, props, opts ) {
 	// Handle queue: false promises
 	if ( !opts.queue ) {
 		hooks = jQuery._queueHooks( elem, "fx" );
-		if ( hooks.unqueued == null ) {
-			hooks.unqueued = 0;
+		if ( hooks[ unqueued ] == null ) {
+			hooks[ unqueued ] = 0;
 			oldfire = hooks.empty.fire;
 			hooks.empty.fire = function() {
-				if ( !hooks.unqueued ) {
+				if ( !hooks[ unqueued ] ) {
 					oldfire();
 				}
 			};
 		}
-		hooks.unqueued++;
+		hooks[ unqueued ]++;
 
 		anim.always( function() {
 
 			// Ensure the complete handler is called before this completes
 			anim.always( function() {
-				hooks.unqueued--;
+				hooks[ unqueued ]--;
 				if ( !jQuery.queue( elem, "fx" ).length ) {
 					hooks.empty.fire();
 				}
@@ -405,33 +406,36 @@ jQuery.Animation = jQuery.extend( Animation, {
 } );
 
 jQuery.speed = function( speed, easing, fn ) {
-	var fx = jQuery.fx,
+	var
+		isFn = "isFunction",
+		d = "duration", s = "speeds", q = "queue",
+		fx = jQuery.fx,
 		opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
 		complete: fn || !fn && easing ||
-			jQuery.isFunction( speed ) && speed,
+			jQuery[ isFn ]( speed ) && speed,
 		duration: speed,
-		easing: fn && easing || easing && !jQuery.isFunction( easing ) && easing
+		easing: fn && easing || easing && !jQuery[ isFn ]( easing ) && easing
 	};
 
-	opt.duration = fx.off ? 0 : typeof opt.duration === "number" ?
-		opt.duration : opt.duration in fx.speeds ?
-			fx.speeds[ opt.duration ] : fx.speeds._default;
+	opt[ d ] = fx.off ? 0 : typeof opt[ d ] === "number" ?
+		opt[ d ] : opt[ d ] in fx[ s ] ?
+			fx[ s ] [ opt[ d ] ] : fx[ s ]._default;
 
 	// Normalize opt.queue - true/undefined/null -> "fx"
-	if ( opt.queue == null || opt.queue === true ) {
-		opt.queue = "fx";
+	if ( opt[ q ] == null || opt[ q ] === true ) {
+		opt[ q ] = "fx";
 	}
 
 	// Queueing
 	opt.old = opt.complete;
 
 	opt.complete = function() {
-		if ( jQuery.isFunction( opt.old ) ) {
+		if ( jQuery[ isFn ]( opt.old ) ) {
 			opt.old.call( this );
 		}
 
-		if ( opt.queue ) {
-			jQuery.dequeue( this, opt.queue );
+		if ( opt[ q ] ) {
+			jQuery.dequeue( this, opt[ q ] );
 		}
 	};
 

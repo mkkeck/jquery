@@ -23,11 +23,14 @@ var rootjQuery,
 	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
 
 	init = jQuery.fn.init = function( selector, context, root ) {
-		var match, elem, sel = "selector", ctx = "context", t = this;
+		var match, elem,
+			that = this,
+			sel = "selector",
+			ctx = "context";
 
 		// HANDLE: $(""), $(null), $(undefined), $(false)
 		if ( !selector ) {
-			return t;
+			return that;
 		}
 
 		// Method init() accepts an alternate rootjQuery
@@ -56,7 +59,7 @@ var rootjQuery,
 
 					// Option to run scripts is true for back-compat
 					// Intentionally let the error be thrown if parseHTML is not present
-					jQuery.merge( t, jQuery.parseHTML(
+					jQuery.merge( that, jQuery.parseHTML(
 						match[ 1 ],
 						context && context[ domType ] ? context[ getOwnDoc ] || context : document,
 						true
@@ -67,17 +70,17 @@ var rootjQuery,
 						for ( match in context ) {
 
 							// Properties of context are called as methods if possible
-							if ( jQuery.isFunction( t[ match ] ) ) {
-								t[ match ]( context[ match ] );
+							if ( jQuery.isFunction( that[ match ] ) ) {
+                that[ match ]( context[ match ] );
 
 							// ...and otherwise set as attributes
 							} else {
-								t.attr( match, context[ match ] );
+                that.attr( match, context[ match ] );
 							}
 						}
 					}
 
-					return t;
+					return that;
 
 				// HANDLE: $(#id)
 				} else {
@@ -88,13 +91,13 @@ var rootjQuery,
 					if ( elem && elem[ domParent ] ) {
 
 						// Inject the element directly into the jQuery object
-						t.length = 1;
-						t[ 0 ] = elem;
+						that.length = 1;
+						that[ 0 ] = elem;
 					}
 
-					t[ ctx ] = document;
-					t[ sel ] = selector;
-					return t;
+					that[ ctx ] = document;
+					that[ sel ] = selector;
+					return that;
 				}
 
 			// HANDLE: $(expr, $(...))
@@ -104,14 +107,14 @@ var rootjQuery,
 			// HANDLE: $(expr, context)
 			// (which is just equivalent to: $(context).find(expr)
 			} else {
-				return t.constructor( context ).find( selector );
+				return that.constructor( context ).find( selector );
 			}
 
 		// HANDLE: $(DOMElement)
 		} else if ( selector[ domType ] ) {
-			t[ ctx ] = t[ 0 ] = selector;
-			t.length = 1;
-			return t;
+			that[ ctx ] = that[ 0 ] = selector;
+			that.length = 1;
+			return that;
 
 		// HANDLE: $(function)
 		// Shortcut for document ready
@@ -124,11 +127,11 @@ var rootjQuery,
 		}
 
 		if ( selector[ sel ] !== undef ) {
-			t[ sel ] = selector[ sel ];
-			t[ ctx ] = selector[ ctx ];
+			that[ sel ] = selector[ sel ];
+			that[ ctx ] = selector[ ctx ];
 		}
 
-		return jQuery.makeArray( selector, t );
+		return jQuery.makeArray( selector, that );
 	};
 
 // Give the init function the jQuery prototype for later instantiation

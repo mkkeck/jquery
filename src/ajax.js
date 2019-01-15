@@ -9,6 +9,17 @@ define( [
 	"./var/domType",
 	"./var/strlower",
 	"./var/strreplace",
+
+	"./ajax/var/mimeappform",
+	"./ajax/var/mimeappxml",
+  "./ajax/var/mimeappxecma",
+  "./ajax/var/mimeappecma",
+  "./ajax/var/mimeappjs",
+  "./ajax/var/mimeappjson",
+  "./ajax/var/mimetextjs",
+  "./ajax/var/mimescript",
+  "./ajax/var/mimejson",
+
 	"./var/undef",
 
 	"./core/init",
@@ -18,10 +29,14 @@ define( [
 	"./deferred"
 ], function(
 	jQuery, document, rnotwhite, location, nonce, rquery,
-	createElem, domType, strlower, strreplace, undef
+	createElem, domType, strlower, strreplace,
+  mimeappform, mimeappxml, mimeappxecma, mimeappecma, mimeappjs, mimeappjson,
+  mimetextjs, mimescript, mimejson,
+  undef
 ) {
 
 var
+  contentType = "Content-Type",
 	rhash = /#.*$/,
 	rts = /([?&])_=[^&]*/,
 	rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg,
@@ -150,7 +165,7 @@ function ajaxHandleResponses( s, jqXHR, responses ) {
 	while ( dataTypes[ 0 ] === "*" ) {
 		dataTypes.shift();
 		if ( ct === undef ) {
-			ct = s.mimeType || jqXHR.getResponseHeader( "Content-Type" );
+			ct = s.mimeType || jqXHR.getResponseHeader( contentType );
 		}
 	}
 
@@ -310,7 +325,7 @@ jQuery.extend( {
 		global: true,
 		processData: true,
 		async: true,
-		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		contentType: mimeappform + "; charset=UTF-8",
 		/*
 		timeout: 0,
 		data: null,
@@ -327,8 +342,8 @@ jQuery.extend( {
 			"*": allTypes,
 			text: "text/plain",
 			html: "text/html",
-			xml: "application/xml, text/xml",
-			json: "application/json, text/javascript"
+			xml: mimeappxml + ", text/xml",
+			json: mimeappjson + ", " + mimetextjs
 		},
 
 		contents: {
@@ -420,6 +435,7 @@ jQuery.extend( {
 			i,
 
 			// Create the final options object
+      pre = "ajax",
 			s = jQuery.ajaxSetup( {}, options ),
 
 			// Callbacks context
@@ -586,7 +602,7 @@ jQuery.extend( {
 
 		// Watch for a new set of requests
 		if ( fireGlobals && jQuery.active++ === 0 ) {
-			jQuery.event.trigger( "ajaxStart" );
+			jQuery.event.trigger( pre + "Start" );
 		}
 
 		// Uppercase the type
@@ -634,7 +650,7 @@ jQuery.extend( {
 
 		// Set the correct header, if data is being sent
 		if ( s.data && s.hasContent && s.contentType !== false || options.contentType ) {
-			jqXHR[ setReqHeader ]( "Content-Type", s.contentType );
+			jqXHR[ setReqHeader ]( contentType, s.contentType );
 		}
 
 		// Set the Accepts header for the server, depending on the dataType
@@ -678,7 +694,7 @@ jQuery.extend( {
 
 			// Send global event
 			if ( fireGlobals ) {
-				globalEventContext.trigger( "ajaxSend", [ jqXHR, s ] );
+				globalEventContext.trigger( pre + "Send", [ jqXHR, s ] );
 			}
 
 			// If request was aborted inside ajaxSend, stop there
@@ -804,7 +820,7 @@ jQuery.extend( {
 			statusCode = undef;
 
 			if ( fireGlobals ) {
-				globalEventContext.trigger( isSuccess ? "ajaxSuccess" : "ajaxError",
+				globalEventContext.trigger( pre + ( isSuccess ? "Success" : "Error" ),
 					[ jqXHR, s, isSuccess ? success : error ] );
 			}
 
@@ -812,11 +828,11 @@ jQuery.extend( {
 			completeDeferred.fireWith( callbackContext, [ jqXHR, statusText ] );
 
 			if ( fireGlobals ) {
-				globalEventContext.trigger( "ajaxComplete", [ jqXHR, s ] );
+				globalEventContext.trigger( pre + "Complete", [ jqXHR, s ] );
 
 				// Handle the global AJAX counter
 				if ( !( --jQuery.active ) ) {
-					jQuery.event.trigger( "ajaxStop" );
+					jQuery.event.trigger( pre + "Stop" );
 				}
 			}
 		}
@@ -825,11 +841,11 @@ jQuery.extend( {
 	},
 
 	getJSON: function( url, data, callback ) {
-		return jQuery.get( url, data, callback, "json" );
+		return jQuery.get( url, data, callback, mimejson );
 	},
 
 	getScript: function( url, callback ) {
-		return jQuery.get( url, undef, callback, "script" );
+		return jQuery.get( url, undef, callback, mimescript );
 	}
 } );
 

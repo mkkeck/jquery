@@ -280,6 +280,7 @@ jQuery.extend( {
 
 		// Make sure that we're working with the right name
 		var ret, type, hooks,
+			num = "number",
 			origName = jQuery.camelCase( name ),
 			cssProps = jQuery.cssProps,
 			cssHooks = jQuery.cssHooks,
@@ -300,7 +301,7 @@ jQuery.extend( {
 				value = adjustCSS( elem, name, ret );
 
 				// Fixes bug #9237
-				type = "number";
+				type = num;
 			}
 
 			// Make sure that null and NaN values aren't set (#7116)
@@ -309,7 +310,7 @@ jQuery.extend( {
 			}
 
 			// If a number was passed in, add the unit (except for certain CSS properties)
-			if ( type === "number" ) {
+			if ( type === num ) {
 				value += ret && ret[ 3 ] || ( jQuery.cssNumber[ origName ] ? "" : "px" );
 			}
 

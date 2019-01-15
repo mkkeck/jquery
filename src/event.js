@@ -300,7 +300,7 @@ jQuery.event = {
 		event = jQuery.event.fix( event );
 
 		var i, j, ret, matched, handleObj,
-			handlerQueue = [],
+			handlerQueue,
 			args = slice.call( arguments ),
 			handlers = ( dataPriv.get( this, "events" ) || {} )[ event.type ] || [],
 			special = jQuery.event.special[ event.type ] || {};
@@ -428,22 +428,27 @@ jQuery.event = {
 		props: ( "button buttons clientX clientY offsetX offsetY pageX pageY " +
 			"screenX screenY toElement" ).split( " " ),
 		filter: function( event, original ) {
-			var eventDoc, doc, body,
+			var eventDoc, doc,
 				button = original.button,
-				sl = "scrollLeft", st = "scrollTop", cl = "clientLeft", ct = "clientTop";
+				body = "body",
+				p = "page",
+				c = "client",
+				s = "scroll",
+				L = "Left",
+				T = "Top";
 
 			// Calculate pageX/Y if missing and clientX/Y available
-			if ( event.pageX == null && original.clientX != null ) {
+			if ( event[ p + "X" ] == null && original[ c + "X" ] != null ) {
 				eventDoc = event.target[ getOwnDoc ] || document;
 				doc = eventDoc[ getDocElem ];
-				body = eventDoc.body;
+				body = eventDoc[ body ];
 
-				event.pageX = original.clientX +
-					( doc && doc[ sl ] || body && body[ sl ] || 0 ) -
-					( doc && doc[ cl ] || body && body[ cl ] || 0 );
-				event.pageY = original.clientY +
-					( doc && doc[ st ]  || body && body[ st ]  || 0 ) -
-					( doc && doc[ ct ]  || body && body[ ct ]  || 0 );
+				event[ p + "X" ] = original[ c + "X" ] +
+					( doc && doc[ s + L ] || body && body[ s + L ] || 0 ) -
+					( doc && doc[ c + L ] || body && body[ c + L ] || 0 );
+				event[ p + "Y" ] = original[ c + "Y" ] +
+					( doc && doc[ s + T ]  || body && body[ s + T ]  || 0 ) -
+					( doc && doc[ c + T ]  || body && body[ c + T ]  || 0 );
 			}
 
 			// Add which for click: 1 === left; 2 === middle; 3 === right

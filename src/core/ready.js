@@ -3,10 +3,11 @@ define( [
 	"../var/document",
 	"../var/evtListenerAdd",
 	"../var/evtListenerRemove",
+	"../var/getDocElem",
 
 	"../core/init",
 	"../deferred"
-], function( jQuery, document, evtListenerAdd, evtListenerRemove ) {
+], function( jQuery, document, evtListenerAdd, evtListenerRemove, getDocElem ) {
 
 // The deferred used on DOM ready
 var readyList, domLoaded = "DOMContentLoaded";
@@ -84,7 +85,7 @@ jQuery.ready.promise = function( obj ) {
 		// Older IE sometimes signals "interactive" too soon
 		var drs = document.readyState;
 		if ( drs === "complete" ||
-			( drs !== "loading" && !document.documentElement.doScroll ) ) {
+			( drs !== "loading" && !document[ getDocElem ].doScroll ) ) {
 
 			// Handle it asynchronously to allow scripts the opportunity to delay ready
 			window.setTimeout( jQuery.ready );

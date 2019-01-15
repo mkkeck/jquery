@@ -6,6 +6,7 @@ function showHide( elements, show ) {
 	var display, elem,
 		values = [],
 		index = 0,
+		style = "style",
 		none = "none",
 		attr = "display",
 		length = elements.length;
@@ -13,11 +14,11 @@ function showHide( elements, show ) {
 	// Determine new display value for elements that need to change
 	for ( ; index < length; index++ ) {
 		elem = elements[ index ];
-		if ( !elem.style ) {
+		if ( !elem[ style ] ) {
 			continue;
 		}
 
-		display = elem.style[ attr ];
+		display = elem[ style ][ attr ];
 		if ( show ) {
 			if ( display === none ) {
 
@@ -38,7 +39,7 @@ function showHide( elements, show ) {
 	// to avoid the constant reflow
 	for ( index = 0; index < length; index++ ) {
 		if ( values[ index ] != null ) {
-			elements[ index ].style[ attr ] = values[ index ];
+			elements[ index ][ style ][ attr ] = values[ index ];
 		}
 	}
 

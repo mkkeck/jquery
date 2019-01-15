@@ -11,6 +11,7 @@ define( [
 	"./var/getDocElem",
 	"./var/domNode",
 	"./var/domType",
+  "./var/strreplace",
 	"./var/undef",
 
 	"./core/init",
@@ -19,7 +20,7 @@ define( [
 ], function(
 	jQuery, access, document, documentElement, rnumnonpx,
 	curCSS, addGetHookIf, support,
-	getOwnDoc, getDocElem, domNode, domType, undef
+	getOwnDoc, getDocElem, domNode, domType, strreplace, undef
 ) {
 
 /**
@@ -31,11 +32,14 @@ function getWindow( elem ) {
 
 jQuery.offset = {
 	setOffset: function( elem, options, i ) {
-		var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft, calculatePosition,
+		var curPosition, curLeft, curCSSTop, curTop, curOffset, curCSSLeft,
+			calculatePosition,
 			pos = "position",
 			position = jQuery.css( elem, pos ),
 			curElem = jQuery( elem ),
-			props = {};
+			props = {},
+			top = "top",
+			left = "left";
 
 		// Set position first, in-case top/left are set even on static elem
 		if ( position === "static" ) {
@@ -43,8 +47,8 @@ jQuery.offset = {
 		}
 
 		curOffset = curElem.offset();
-		curCSSTop = jQuery.css( elem, "top" );
-		curCSSLeft = jQuery.css( elem, "left" );
+		curCSSTop = jQuery.css( elem, top );
+		curCSSLeft = jQuery.css( elem, left );
 		calculatePosition = ( position === "absolute" || position === "fixed" ) &&
 			( curCSSTop + curCSSLeft ).indexOf( "auto" ) > -1;
 
@@ -52,8 +56,8 @@ jQuery.offset = {
 		// top or left is auto and position is either absolute or fixed
 		if ( calculatePosition ) {
 			curPosition = curElem[ pos ]();
-			curTop = curPosition.top;
-			curLeft = curPosition.left;
+			curTop = curPosition[ top ];
+			curLeft = curPosition [ left ];
 
 		} else {
 			curTop = parseFloat( curCSSTop ) || 0;
@@ -66,11 +70,11 @@ jQuery.offset = {
 			options = options.call( elem, i, jQuery.extend( {}, curOffset ) );
 		}
 
-		if ( options.top != null ) {
-			props.top = ( options.top - curOffset.top ) + curTop;
+		if ( options[ top ] != null ) {
+			props[ top ] = ( options[ top ] - curOffset[ top ] ) + curTop;
 		}
-		if ( options.left != null ) {
-			props.left = ( options.left - curOffset.left ) + curLeft;
+		if ( options[ left ] != null ) {
+			props[ left ] = ( options[ left ] - curOffset[ left ] ) + curLeft;
 		}
 
 		if ( "using" in options ) {
@@ -84,16 +88,17 @@ jQuery.offset = {
 
 jQuery.fn.extend( {
 	offset: function( options ) {
+		var that = this;
 		if ( arguments.length ) {
 			return options === undef ?
-				this :
-				this.each( function( i ) {
+				that :
+				that.each( function( i ) {
 					jQuery.offset.setOffset( this, options, i );
 				} );
 		}
 
 		var docElem, win,
-			elem = this[ 0 ],
+			elem = that[ 0 ],
 			box = { top: 0, left: 0 },
 			doc = elem && elem[ getOwnDoc ];
 
@@ -117,12 +122,13 @@ jQuery.fn.extend( {
 	},
 
 	position: function() {
-		if ( !this[ 0 ] ) {
+		var that = this;
+		if ( !that[ 0 ] ) {
 			return;
 		}
 
 		var offsetParent, offset,
-			elem = this[ 0 ],
+			elem = that[ 0 ],
 			parentOffset = { top: 0, left: 0 };
 
 		// Fixed elements are offset from window (parentOffset = {top:0, left: 0},
@@ -135,10 +141,10 @@ jQuery.fn.extend( {
 		} else {
 
 			// Get *real* offsetParent
-			offsetParent = this.offsetParent();
+			offsetParent = that.offsetParent();
 
 			// Get correct offsets
-			offset = this.offset();
+			offset = that.offset();
 			if ( !jQuery[ domNode ]( offsetParent[ 0 ], "html" ) ) {
 				parentOffset = offsetParent.offset();
 			}

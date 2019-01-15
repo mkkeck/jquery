@@ -29,10 +29,10 @@ var rparentsprev = /^(?:parents|prev(?:Until|All))/,
 
 jQuery.fn.extend( {
 	has: function( target ) {
-		var t = this, targets = jQuery( target, t ),
+		var that = this, targets = jQuery( target, that ),
 			l = targets.length;
 
-		return t.filter( function() {
+		return that.filter( function() {
 			var i = 0;
 			for ( ; i < l; i++ ) {
 				if ( jQuery.contains( this, targets[ i ] ) ) {
@@ -43,16 +43,16 @@ jQuery.fn.extend( {
 	},
 
 	closest: function( selectors, context ) {
-		var cur, nt, t = this,
+		var cur, nt, that = this,
 			i = 0,
-			l = t.length,
+			l = that.length,
 			matched = [],
 			pos = rneedsContext.test( selectors ) || typeof selectors !== "string" ?
-				jQuery( selectors, context || t.context ) :
+				jQuery( selectors, context || that.context ) :
 				0;
 
 		for ( ; i < l; i++ ) {
-			for ( cur = t[ i ]; cur && cur !== context; cur = cur[ domParent ] ) {
+			for ( cur = that[ i ]; cur && cur !== context; cur = cur[ domParent ] ) {
 				nt = cur[ domType ];
 
 				// Always skip document fragments
@@ -69,25 +69,25 @@ jQuery.fn.extend( {
 			}
 		}
 
-		return t.pushStack( matched.length > 1 ? jQuery.uniqueSort( matched ) : matched );
+		return that.pushStack( matched.length > 1 ? jQuery.uniqueSort( matched ) : matched );
 	},
 
 	// Determine the position of an element within the set
 	index: function( elem ) {
-		var t = this;
+		var that = this;
 
 		// No argument, return index in parent
 		if ( !elem ) {
-			return ( t[ 0 ] && t[ 0 ][ domParent ] ) ? t.first().prevAll().length : -1;
+			return ( that[ 0 ] && that[ 0 ][ domParent ] ) ? that.first().prevAll().length : -1;
 		}
 
 		// Index in selector
 		if ( typeof elem === "string" ) {
-			return indexOf.call( jQuery( elem ), t[ 0 ] );
+			return indexOf.call( jQuery( elem ), that[ 0 ] );
 		}
 
 		// Locate the position of the desired element
-		return indexOf.call( t,
+		return indexOf.call( that,
 
 			// If it receives a jQuery object, the first element is used
 			elem.jquery ? elem[ 0 ] : elem

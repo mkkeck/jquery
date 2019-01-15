@@ -3,10 +3,19 @@ define( [
 	"./var/nonce",
 	"./var/rquery",
 	"../var/strreplace",
+
+  "./var/mimeappform",
+  "./var/mimescript",
+  "./var/mimejson",
+
 	"../var/undef",
 
 	"../ajax"
-], function( jQuery, nonce, rquery, strreplace, undef ) {
+], function(
+  jQuery, nonce, rquery, strreplace,
+  mimeappform, mimescript, mimejson,
+  undef
+) {
 
 var oldCallbacks = [],
 	rjsonp = /(=)\?(?=&|$)|\?\?/;
@@ -22,20 +31,21 @@ jQuery.ajaxSetup( {
 } );
 
 // Detect, normalize options and install callbacks for jsonp requests
-jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
+jQuery.ajaxPrefilter( mimejson + " " + mimejson + "p", function( s, originalSettings, jqXHR ) {
 
 	var callbackName, overwritten, responseContainer,
-		jsonCB = "jsonpCallback",
-		jsonProp = s.jsonp !== false && ( rjsonp.test( s.url ) ?
+    jsonp = mimejson + "p",
+		jsonCB = jsonp + "Callback",
+		jsonProp = s[ jsonp ] !== false && ( rjsonp.test( s.url ) ?
 			"url" :
 			typeof s.data === "string" &&
 				( s.contentType || "" )
-					.indexOf( "application/x-www-form-urlencoded" ) === 0 &&
+					.indexOf( mimeappform ) === 0 &&
 				rjsonp.test( s.data ) && "data"
 		);
 
 	// Handle iff the expected data type is "jsonp" or we have a parameter to set
-	if ( jsonProp || s.dataTypes[ 0 ] === "jsonp" ) {
+	if ( jsonProp || s.dataTypes[ 0 ] === jsonp ) {
 
 		// Get callback name, remembering preexisting value associated with it
 		callbackName = s[ jsonCB ] = jQuery.isFunction( s[ jsonCB ] ) ?
@@ -45,12 +55,12 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 		// Insert callback into url or form data
 		if ( jsonProp ) {
 			s[ jsonProp ] = strreplace( s[ jsonProp ], rjsonp, "$1" + callbackName );
-		} else if ( s.jsonp !== false ) {
-			s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s.jsonp + "=" + callbackName;
+		} else if ( s[ jsonp ] !== false ) {
+			s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s[ jsonp ] + "=" + callbackName;
 		}
 
 		// Use data converter to retrieve json after script execution
-		s.converters[ "script json" ] = function() {
+		s.converters[ mimescript + " " + mimejson ] = function() {
 			if ( !responseContainer ) {
 				jQuery.error( callbackName + " was not called" );
 			}
@@ -58,7 +68,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 		};
 
 		// Force json dataType
-		s.dataTypes[ 0 ] = "json";
+		s.dataTypes[ 0 ] = mimejson;
 
 		// Install callback
 		overwritten = window[ callbackName ];
@@ -97,7 +107,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 		} );
 
 		// Delegate to script
-		return "script";
+		return mimescript;
 	}
 } );
 

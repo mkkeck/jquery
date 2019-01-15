@@ -5,7 +5,8 @@ define( [
 ], function( document, support, createElem ) {
 
 ( function() {
-	var input = createElem( "input", document ),
+	var tag = "input",
+		input = createElem( tag, document ),
 		select = createElem( "select", document ),
 		opt = select.appendChild( createElem( "option", document ) );
 
@@ -26,7 +27,7 @@ define( [
 
 	// Support: IE<=11+
 	// An input loses its value after becoming a radio
-	input = createElem( "input", document );
+	input = createElem( tag, document );
 	input.value = "t";
 	input.type = "radio";
 	support.radioValue = input.value === "t";

@@ -20,10 +20,10 @@ function getClass( elem ) {
 jQuery.fn.extend( {
 	addClass: function( value ) {
 		var classes, elem, cur, curValue, clazz, j, finalValue,
-			i = 0;
+			i = 0, that = this;
 
 		if ( jQuery.isFunction( value ) ) {
-			return this.each( function( j ) {
+			return that.each( function( j ) {
 				jQuery( this ).addClass( value.call( this, j, getClass( this ) ) );
 			} );
 		}
@@ -31,7 +31,7 @@ jQuery.fn.extend( {
 		if ( typeof value === "string" && value ) {
 			classes = value.match( rnotwhite ) || [];
 
-			while ( ( elem = this[ i++ ] ) ) {
+			while ( ( elem = that[ i++ ] ) ) {
 				curValue = getClass( elem );
 				cur = elem[ domType ] === 1 &&
 					strreplace( " " + curValue + " ", rclass, " " );
@@ -53,27 +53,27 @@ jQuery.fn.extend( {
 			}
 		}
 
-		return this;
+		return that;
 	},
 
 	removeClass: function( value ) {
 		var classes, elem, cur, curValue, clazz, j, finalValue,
-			i = 0;
+			i = 0, that = this;
 
 		if ( jQuery.isFunction( value ) ) {
-			return this.each( function( j ) {
+			return that.each( function( j ) {
 				jQuery( this ).removeClass( value.call( this, j, getClass( this ) ) );
 			} );
 		}
 
 		if ( !arguments.length ) {
-			return this.attr( "class", "" );
+			return that.attr( "class", "" );
 		}
 
 		if ( typeof value === "string" && value ) {
 			classes = value.match( rnotwhite ) || [];
 
-			while ( ( elem = this[ i++ ] ) ) {
+			while ( ( elem = that[ i++ ] ) ) {
 				curValue = getClass( elem );
 
 				// This expression is here for better compressibility (see addClass)
@@ -99,18 +99,18 @@ jQuery.fn.extend( {
 			}
 		}
 
-		return this;
+		return that;
 	},
 
 	toggleClass: function( value, stateVal ) {
-		var type = typeof value;
+		var type = typeof value, that = this;
 
 		if ( typeof stateVal === "boolean" && type === "string" ) {
-			return stateVal ? this.addClass( value ) : this.removeClass( value );
+			return stateVal ? that.addClass( value ) : that.removeClass( value );
 		}
 
 		if ( jQuery.isFunction( value ) ) {
-			return this.each( function( i ) {
+			return that.each( function( i ) {
 				jQuery( this ).toggleClass(
 					value.call( this, i, getClass( this ), stateVal ),
 					stateVal
@@ -118,16 +118,16 @@ jQuery.fn.extend( {
 			} );
 		}
 
-		return this.each( function() {
+		return that.each( function() {
 			var className, i, self, classNames,
 				classPriv = "__className__",
-				t = this;
+				that = this;
 
 			if ( type === "string" ) {
 
 				// Toggle individual class names
 				i = 0;
-				self = jQuery( t );
+				self = jQuery( that );
 				classNames = value.match( rnotwhite ) || [];
 
 				while ( ( className = classNames[ i++ ] ) ) {
@@ -140,22 +140,22 @@ jQuery.fn.extend( {
 
 			// Toggle whole class name
 			} else if ( value === undef || type === "boolean" ) {
-				className = getClass( t );
+				className = getClass( that );
 				if ( className ) {
 
 					// Store className if set
-					dataPriv.set( t, classPriv, className );
+					dataPriv.set( that, classPriv, className );
 				}
 
 				// If the element has a class name or if we're passed `false`,
 				// then remove the whole classname (if there was one, the above saved it).
 				// Otherwise bring back whatever was previously saved (if anything),
 				// falling back to the empty string if nothing was stored.
-				if ( t[ setAttr ] ) {
-					t[ setAttr ]( "class",
+				if ( that[ setAttr ] ) {
+          that[ setAttr ]( "class",
 						className || value === false ?
 						"" :
-						dataPriv.get( t, classPriv ) || ""
+						dataPriv.get( that, classPriv ) || ""
 					);
 				}
 			}

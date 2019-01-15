@@ -15,10 +15,12 @@ define( [
   "./var/domNode",
   "./var/domType",
   "./var/domParent",
+  "./ajax/var/mimescript",
   "./var/undef"
 ], function(
 	arr, document, slice, concat, push, indexOf, class2type, toString, hasOwn,
-	support, createElem, strlower, strreplace, domNode, domType, domParent, undef
+	support, createElem, strlower, strreplace, domNode, domType, domParent,
+  mimescript, undef
 ) {
 
 var
@@ -292,7 +294,7 @@ jQuery.extend( {
 			// strict mode pragma, execute code by injecting a
 			// script tag into the document.
 			if ( code.indexOf( "use strict" ) === 1 ) {
-				script = createElem( "script", document );
+				script = createElem( mimescript, document );
 				script.text = code;
 				document.head.appendChild( script )[ domParent ].removeChild( script );
 			} else {

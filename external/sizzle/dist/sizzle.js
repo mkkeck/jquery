@@ -6,7 +6,7 @@
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2019-01-14
+ * Date: 2019-01-15, modfied and un-official
  */
 ( function( window ) {
 
@@ -199,10 +199,10 @@
       ),
       CHILD: regExp(
         "^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\(" +
-          whitespace + "*(even|odd|(([+-]|)(\\d*)n|)" +
-          whitespace + "*(?:([+-]|)" +
-          whitespace + "*(\\d+)|))" +
-          whitespace + "*\\)|)",
+        whitespace + "*(even|odd|(([+-]|)(\\d*)n|)" +
+        whitespace + "*(?:([+-]|)" +
+        whitespace + "*(\\d+)|))" +
+        whitespace + "*\\)|)",
         "i"
       ),
       bool: regExp(
@@ -214,22 +214,22 @@
       // We use this for POS matching in `select`
       needsContext: regExp(
         "^" +
-          whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
-          whitespace + "*((?:-\\d)?\\d*)" +
-          whitespace + "*\\)|)(?=[^-]|$)",
+        whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
+        whitespace + "*((?:-\\d)?\\d*)" +
+        whitespace + "*\\)|)(?=[^-]|$)",
         "i"
       )
     },
 
     rheader = /^h\d$/i,
 
-    rnative = /^[^{]+\{\s*\[native \w/,
+    rnative = /^[^{]+{\s*\[native \w/,
 
     // Easily-parseable/retrievable ID or TAG or CLASS selectors
     rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
 
     rsibling = /[+~]/,
-    rescape = /'|\\/g,
+    rescape = /['\\]/g,
 
     // CSS escapes http://www.w3.org/TR/CSS21/syndata.html#escaped-characters
     runescape = regExp(
@@ -237,7 +237,7 @@
       "ig"
     ),
     funescape = function( _, escaped, escapedWhitespace ) {
-      var high = "0x" + escaped - 0x10000;
+      var high = "0x" + escaped - 0x10000, sfc = "fromCharCode";
 
       // NaN means non-codepoint
       // Support: Firefox<24
@@ -247,10 +247,10 @@
         high < 0 ?
 
           // BMP codepoint
-          String.fromCharCode( high + 0x10000 ) :
+          String[ sfc ]( high + 0x10000 ) :
 
           // Supplemental Plane codepoint (surrogate pair)
-          String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
+          String[ sfc ]( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
     },
 
     // Used for iframes
@@ -270,14 +270,15 @@
 
   // Optimize for push.apply( _, NodeList )
   try {
+    var pdcn = preferredDoc.childNodes;
     push.apply(
-      ( arr = slice.call( preferredDoc.childNodes ) ),
-      preferredDoc.childNodes
+      ( arr = slice.call( pdcn ) ),
+      pdcn
     );
 
     // Support: Android<4.0
     // Detect silently failing push.apply
-    arr[ preferredDoc.childNodes.length ][ domType ];
+    arr[ pdcn.length ][ domType ] = arr[ pdcn.length ][ domType ];
   } catch ( e ) {
     push = {
       apply: arr.length ?
@@ -510,8 +511,8 @@
    * Adds the same handler for all of the specified attrs
    * @param {String} attrs Pipe-separated list of attributes
    * @param {Function} handler The method that will be applied
-   */
-  function addHandle( attrs, handler ) {
+   *
+   function addHandle( attrs, handler ) {
     var arr = attrs.split( "|" ),
       i = arr.length;
 
@@ -519,6 +520,7 @@
       Expr.attrHandle[ arr[ i ] ] = handler;
     }
   }
+   /**/
 
   /**
    * Checks document order of two siblings
@@ -629,7 +631,8 @@
     var
       hasCompare,
       parent,
-      attachEv = "attacheEvent",
+
+      //attachEv = "attacheEvent",
       unloadEv = "unload",
       doc = node ? node[ getOwnDoc ] || node : preferredDoc;
 
@@ -653,11 +656,10 @@
       // Support: IE 11
       if ( parent[ evtListenerAdd ] ) {
         parent[ evtListenerAdd ]( unloadEv, unloadHandler, false );
-
+      } //else if ( parent[ attachEv ] ) {
         // Support: IE 9 - 10 only
-      } else if ( parent[ attachEv ] ) {
-        parent[ attachEv ]( "on" + unloadEv, unloadHandler );
-      }
+      //  parent[ attachEv ]( "on" + unloadEv, unloadHandler );
+      //}
     }
 
     /* Attributes
@@ -666,11 +668,11 @@
     // Support: IE<8
     // Verify that getAttribute really returns attributes and not properties
     // (excepting IE8 booleans)
-    support.attributes = assert( function( el ) {
-      var name = "className";
-      el[ name ] = "i";
-      return !el[ getAttr ]( name );
-    } );
+    //support.attributes = assert( function( el ) {
+    //  var name = "className";
+    //  el[ name ] = "i";
+    //  return !el[ getAttr ]( name );
+    //} );
 
     /* getElement(s)By*
     ---------------------------------------------------------------------- */
@@ -863,10 +865,10 @@
       support[ matchSelector ] = rnative.test(
         (
           matches = docElem.matches ||
-          docElem[ "webkit" + MatchSelector ] ||
-          docElem[ "moz" + MatchSelector ] ||
-          docElem[ "o" + MatchSelector ] ||
-          docElem[ "ms" + MatchSelector ]
+            docElem[ "webkit" + MatchSelector ] ||
+            docElem[ "moz" + MatchSelector ] ||
+            docElem[ "o" + MatchSelector ] ||
+            docElem[ "ms" + MatchSelector ]
         )
       )
     ) ) {
@@ -1237,8 +1239,8 @@
           // numeric x and y parameters for Expr.filter.CHILD
           // remember that false/true cast respectively to 0/1
           match[ 4 ] = +( match[ 4 ] ?
-            match[ 5 ] + ( match[ 6 ] || 1 ) :
-            2 * ( match[ 3 ] === "even" || match[ 3 ] === "odd" )
+              match[ 5 ] + ( match[ 6 ] || 1 ) :
+              2 * ( match[ 3 ] === "even" || match[ 3 ] === "odd" )
           );
           match[ 5 ] = +( ( match[ 7 ] + match[ 8 ] ) || match[ 3 ] === "odd" );
 
@@ -1262,7 +1264,7 @@
         if ( match[ 3 ] ) {
           match[ 2 ] = match[ 4 ] || match[ 5 ] || "";
 
-        // Strip excess characters from unquoted arguments
+          // Strip excess characters from unquoted arguments
         } else if (
           unquoted && rpseudo.test( unquoted ) &&
 
@@ -1405,8 +1407,8 @@
                 while ( (
                   node = ++nodeIndex && node && node[ dir ] ||
 
-                  // Fallback to seeking `elem` from the start
-                  ( diff = nodeIndex = 0 ) || start.pop()
+                    // Fallback to seeking `elem` from the start
+                    ( diff = nodeIndex = 0 ) || start.pop()
                 ) ) {
 
                   // When found, cache indexes on `parent` and break
@@ -1442,13 +1444,13 @@
                   // Use the same loop as above to seek `elem` from the start
                   while ( (
                     node = ++nodeIndex && node && node[ dir ] ||
-                    ( diff = nodeIndex = 0 ) || start.pop()
+                      ( diff = nodeIndex = 0 ) || start.pop()
                   ) ) {
 
                     if (
                       ( ofType ?
-                        strlower( node[ domNode ] ) === name :
-                        node[ domType ] === 1
+                          strlower( node[ domNode ] ) === name :
+                          node[ domType ] === 1
                       ) &&
                       ++diff
                     ) {
@@ -1588,8 +1590,8 @@
           do {
             if ( (
               elemLang = documentIsHTML ?
-              elem[ attr ] :
-              elem[ getAttr ]( "xml:" + attr ) || elem[ getAttr ]( attr )
+                elem[ attr ] :
+                elem[ getAttr ]( "xml:" + attr ) || elem[ getAttr ]( attr )
             ) ) {
 
               elemLang = strlower( elemLang );
@@ -2059,7 +2061,7 @@
       matchers = [ function( elem, context, xml ) {
         var ret = ( !leadingRelative && ( xml || context !== outermostContext ) ) ||
           ( ( checkContext = context )[ domType ] ?
-            matchContext( elem, context, xml ) : matchAnyContext( elem, context, xml )
+              matchContext( elem, context, xml ) : matchAnyContext( elem, context, xml )
           );
 
         // Avoid hanging onto element (issue #299)
@@ -2086,15 +2088,15 @@
           return setMatcher(
             i > 1 && elementMatcher( matchers ),
             i > 1 && strreplace(
-              toSelector(
+            toSelector(
 
-                // If the preceding token was a descendant combinator, insert
-                // an implicit any-element `*`
-                tokens.slice( 0, i - 1 ).concat( {
-                  value: tokens[ i - 2 ].type === " " ? "*" : ""
-                } )
-              ),
-              rtrim, "$1"
+              // If the preceding token was a descendant combinator, insert
+              // an implicit any-element `*`
+              tokens.slice( 0, i - 1 ).concat( {
+                value: tokens[ i - 2 ].type === " " ? "*" : ""
+              } )
+            ),
+            rtrim, "$1"
             ),
             matcher,
             i < j && matcherFromTokens( tokens.slice( i, j ) ),
@@ -2373,6 +2375,7 @@
   // Support: IE<8
   // Prevent attribute/property "interpolation"
   // http://msdn.microsoft.com/en-us/library/ms536429%28VS.85%29.aspx
+  /*
   if ( !assert(
     function( el ) {
       el.innerHTML = "<a href='#'></a>";
@@ -2388,9 +2391,11 @@
       }
     );
   }
+  /**/
 
   // Support: IE<9
   // Use defaultValue in place of getAttribute("value")
+  /*
   if ( !support.attributes || !assert(
     function( el ) {
       var attr = "value", fc = "firstChild";
@@ -2408,9 +2413,11 @@
       }
     );
   }
+  /**/
 
   // Support: IE<9
   // Use getAttributeNode to fetch booleans when getAttribute lies
+  /*
   if ( !assert(
     function( el ) {
       return el[ getAttr ]( "disabled" ) == null;
@@ -2428,8 +2435,10 @@
       }
     );
   }
+  /**/
 
   // EXPOSE
+
   if ( typeof define === "function" && define.amd ) {
     define(
       function() {

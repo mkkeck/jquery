@@ -26,6 +26,7 @@ define( [
 	"./var/domType",
 	"./var/domParent",
 	"./var/domNext",
+	"./ajax/var/mimescript",
 	"./var/undef",
 
 	"./core/init",
@@ -36,7 +37,7 @@ define( [
 	jQuery, concat, push, access, rcheckableType, rtagName, rscriptType,
 	wrapMap, getAll, setGlobalEval, buildFragment, support, dataPriv, dataUser, acceptData,
 	createElem, strlower, strreplace, getByTag, getOwnDoc, getAttr, domNode, domType,
-	domParent, domNext, undef
+	domParent, domNext, mimescript, undef
 ) {
 
 var
@@ -118,7 +119,7 @@ function fixInput( src, dest ) {
 	var nodeName = strlower( dest[ domNode ] ),
 		inp = "input",
 		chk = "checked",
-		dfv =  "defaultValue";
+		dfv = "defaultValue";
 
 	// Fails to persist the checked state of a cloned checkbox or radio button.
 	if ( nodeName === inp && rcheckableType.test( src.type ) ) {
@@ -138,7 +139,6 @@ function domManip( collection, args, callback, ignored ) {
 	var fragment, first, scripts, hasScripts, node, doc,
 		i = 0,
 		l = collection.length,
-		s = "script",
 		iNoClone = l - 1,
 		value = args[ 0 ],
 		isFunction = jQuery.isFunction( value );
@@ -166,7 +166,7 @@ function domManip( collection, args, callback, ignored ) {
 
 		// Require either new content or an interest in ignored elements to invoke the callback
 		if ( first || ignored ) {
-			scripts = jQuery.map( getAll( fragment, s ), disableScript );
+			scripts = jQuery.map( getAll( fragment, mimescript ), disableScript );
 			hasScripts = scripts.length;
 
 			// Use the original fragment for the last item
@@ -183,7 +183,7 @@ function domManip( collection, args, callback, ignored ) {
 
 						// Support: Android<4.1, PhantomJS<2
 						// push.apply(_, arraylike) throws on ancient WebKit
-						jQuery.merge( scripts, getAll( node, s ) );
+						jQuery.merge( scripts, getAll( node, mimescript ) );
 					}
 				}
 
@@ -233,7 +233,7 @@ function remove( elem, selector, keepData ) {
 
 		if ( node[ domParent ] ) {
 			if ( keepData && jQuery.contains( node[ getOwnDoc ], node ) ) {
-				setGlobalEval( getAll( node, "script" ) );
+				setGlobalEval( getAll( node, mimescript ) );
 			}
 			node[ domParent ].removeChild( node );
 		}
@@ -249,7 +249,6 @@ jQuery.extend( {
 
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
 		var i, l, srcElements, destElements,
-			s = "script",
 			nType = elem[ domType ],
 			clone = elem.cloneNode( true ),
 			inPage = jQuery.contains( elem[ getOwnDoc ], elem );
@@ -282,9 +281,9 @@ jQuery.extend( {
 		}
 
 		// Preserve script evaluation history
-		destElements = getAll( clone, s );
+		destElements = getAll( clone, mimescript );
 		if ( destElements.length > 0 ) {
-			setGlobalEval( destElements, !inPage && getAll( elem, s ) );
+			setGlobalEval( destElements, !inPage && getAll( elem, mimescript ) );
 		}
 
 		// Return the cloned set

@@ -1,6 +1,7 @@
 define( [
+  "../ajax/var/mimescript",
 	"../ajax"
-], function( jQuery ) {
+], function( mimescript, jQuery ) {
 
 jQuery._evalUrl = function( url ) {
 	return jQuery.ajax( {
@@ -8,7 +9,7 @@ jQuery._evalUrl = function( url ) {
 
 		// Make this explicit, since user can override this through ajaxSetup (#11264)
 		type: "GET",
-		dataType: "script",
+		dataType: mimescript,
 		async: false,
 		global: false,
 		"throws": true

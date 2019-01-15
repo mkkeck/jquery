@@ -1,15 +1,25 @@
 define( [
 	"../core",
 	"../var/document",
+
+  "./var/mimeappjs",
+  "./var/mimeappecma",
+  "./var/mimeappxecma",
+  "./var/mimetextjs",
+  "./var/mimescript",
+
 	"../var/undef",
 	"../ajax"
-], function( jQuery, document, undef ) {
+], function(
+  jQuery, document,
+  mimeappjs, mimeappecma, mimeappxecma, mimetextjs, mimescript,
+  undef
+) {
 
 // Install script dataType
 jQuery.ajaxSetup( {
 	accepts: {
-		script: "text/javascript, application/javascript, " +
-			"application/ecmascript, application/x-ecmascript"
+		script: [ mimetextjs, mimeappjs, mimeappecma, mimeappxecma ].join( ", " )
 	},
 	contents: {
 		script: /\b(?:java|ecma)script\b/
@@ -23,7 +33,7 @@ jQuery.ajaxSetup( {
 } );
 
 // Handle cache's special case and crossDomain
-jQuery.ajaxPrefilter( "script", function( s ) {
+jQuery.ajaxPrefilter( mimescript, function( s ) {
 	if ( s.cache === undef ) {
 		s.cache = false;
 	}
@@ -33,23 +43,23 @@ jQuery.ajaxPrefilter( "script", function( s ) {
 } );
 
 // Bind script tag hack transport
-jQuery.ajaxTransport( "script", function( s ) {
+jQuery.ajaxTransport( mimescript, function( s ) {
 
 	// This transport only deals with cross domain requests
 	if ( s.crossDomain ) {
-		var script, callback;
+		var script, callback, err = "error";
 		return {
 			send: function( _, complete ) {
-				script = jQuery( "<script>" ).prop( {
-					charset: s.scriptCharset,
+				script = jQuery( "<" + mimescript + ">" ).prop( {
+					charset: s[ mimescript + "Charset" ],
 					src: s.url
 				} ).on(
-					"load error",
+					"load " + err,
 					callback = function( evt ) {
 						script.remove();
 						callback = null;
 						if ( evt ) {
-							complete( evt.type === "error" ? 404 : 200, evt.type );
+							complete( evt.type === err ? 404 : 200, evt.type );
 						}
 					}
 				);

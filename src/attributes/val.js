@@ -50,14 +50,14 @@ jQuery.fn.extend( {
 		isFunction = jQuery.isFunction( value );
 
 		return this.each( function( i ) {
-			var val, valHooks = jQuery.valHooks, t = this;
+			var val, valHooks = jQuery.valHooks, that = this;
 
-			if ( t[ domType ] !== 1 ) {
+			if ( that[ domType ] !== 1 ) {
 				return;
 			}
 
 			if ( isFunction ) {
-				val = value.call( t, i, jQuery( t ).val() );
+				val = value.call( that, i, jQuery( that ).val() );
 			} else {
 				val = value;
 			}
@@ -75,11 +75,11 @@ jQuery.fn.extend( {
 				} );
 			}
 
-			hooks = valHooks[ t.type ] || valHooks[ strlower( t[ domNode ] ) ];
+			hooks = valHooks[ that.type ] || valHooks[ strlower( that[ domNode ] ) ];
 
 			// If set returns undefined, fall back to normal setting
-			if ( !hooks || !( "set" in hooks ) || hooks.set( t, val, "value" ) === undef ) {
-				t.value = val;
+			if ( !hooks || !( "set" in hooks ) || hooks.set( that, val, "value" ) === undef ) {
+				that.value = val;
 			}
 		} );
 	}

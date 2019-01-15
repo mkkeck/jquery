@@ -14,48 +14,50 @@ jQuery.Tween = Tween;
 Tween.prototype = {
 	constructor: Tween,
 	init: function( elem, options, prop, end, easing, unit ) {
-		this.elem = elem;
-		this.prop = prop;
-		this.easing = easing || jQuery.easing._default;
-		this.options = options;
-		this.start = this.now = this.cur();
-		this.end = end;
-		this.unit = unit || ( jQuery.cssNumber[ prop ] ? "" : "px" );
+	  var that = this;
+    that.elem = elem;
+    that.prop = prop;
+    that.easing = easing || jQuery.easing._default;
+    that.options = options;
+    that.start = that.now = that.cur();
+    that.end = end;
+    that.unit = unit || ( jQuery.cssNumber[ prop ] ? "" : "px" );
 	},
 	cur: function() {
 		var
-			propHooks = Tween.propHooks,
-			hooks = propHooks[ this.prop ];
+			that = this, propHooks = Tween.propHooks,
+			hooks = propHooks[ that.prop ];
 
 		return hooks && hooks.get ?
-			hooks.get( this ) :
-			propHooks._default.get( this );
+			hooks.get( that ) :
+			propHooks._default.get( that );
 	},
 	run: function( percent ) {
 		var eased, dur,
+      that  = this,
 			propHooks = Tween.propHooks,
-			options = this.options,
-			hooks = propHooks[ this.prop ];
+			options = that.options,
+			hooks = propHooks[ that.prop ];
 
 		if ( ( dur = options.duration ) ) {
-			this.pos = eased = jQuery.easing[ this.easing ](
+      that.pos = eased = jQuery.easing[ that.easing ](
 				percent, dur * percent, 0, 1, dur
 			);
 		} else {
-			this.pos = eased = percent;
+      that.pos = eased = percent;
 		}
-		this.now = ( this.end - this.start ) * eased + this.start;
+    that.now = ( that.end - that.start ) * eased + that.start;
 
 		if ( options.step ) {
-			options.step.call( this.elem, this.now, this );
+			options.step.call( that.elem, that.now, that );
 		}
 
 		if ( hooks && hooks.set ) {
-			hooks.set( this );
+			hooks.set( that );
 		} else {
-			propHooks._default.set( this );
+			propHooks._default.set( that );
 		}
-		return this;
+		return that;
 	}
 };
 

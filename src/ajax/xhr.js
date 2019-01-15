@@ -1,8 +1,9 @@
 define( [
 	"../core",
 	"../var/support",
+	"../var/undef",
 	"../ajax"
-], function( jQuery, support ) {
+], function( jQuery, support, undef ) {
 
 jQuery.ajaxSettings.xhr = function() {
 	try {
@@ -119,7 +120,7 @@ jQuery.ajaxTransport( function( options ) {
 				// Support: IE9
 				// Use onreadystatechange to replace onabort
 				// to handle uncaught aborts
-				if ( xhr.onabort !== undefined ) {
+				if ( xhr.onabort !== undef ) {
 					xhr.onabort = errorCallback;
 				} else {
 					xhr.onreadystatechange = function() {

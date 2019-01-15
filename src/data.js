@@ -82,13 +82,14 @@ jQuery.extend( {
 jQuery.fn.extend( {
 	data: function( key, value ) {
 		var i, name, data,
-			elem = this[ 0 ],
+			that = this,
+			elem = that[ 0 ],
 			attrs = elem && elem.attributes,
 			hasda = "hasDataAttrs";
 
 		// Gets all values
 		if ( key === undef ) {
-			if ( this.length ) {
+			if ( that.length ) {
 				data = dataUser.get( elem );
 
 				if ( elem[ domType ] === 1 && !dataPriv.get( elem, hasda ) ) {
@@ -114,12 +115,12 @@ jQuery.fn.extend( {
 
 		// Sets multiple values
 		if ( typeof key === "object" ) {
-			return this.each( function() {
+			return that.each( function() {
 				dataUser.set( this, key );
 			} );
 		}
 
-		return access( this, function( value ) {
+		return access( that, function( value ) {
 			var data, camelKey;
 
 			// The calling jQuery object (element matches) is not empty
