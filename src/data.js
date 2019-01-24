@@ -7,9 +7,10 @@ define( [
 	"./var/domType",
 	"./var/strlower",
 	"./var/strreplace",
+  "./var/typeOf",
 	"./var/undef"
 ], function(
-	jQuery, access, dataPriv, dataUser, getAttr, domType, strlower, strreplace, undef
+	jQuery, access, dataPriv, dataUser, getAttr, domType, strlower, strreplace, typeOf, undef
 ) {
 
 //	Implementation Summary
@@ -34,7 +35,7 @@ function dataAttr( elem, key, data ) {
 		name = "data-" + strlower( strreplace( key, rmultiDash, "-$&" ) );
 		data = elem[ getAttr ]( name );
 
-		if ( typeof data === "string" ) {
+		if ( typeOf( data, "str" ) ) {
 			try {
 				data = data === "true" ? true :
 					data === "false" ? false :
@@ -114,7 +115,7 @@ jQuery.fn.extend( {
 		}
 
 		// Sets multiple values
-		if ( typeof key === "object" ) {
+		if ( typeOf( key, "obj" ) ) {
 			return that.each( function() {
 				dataUser.set( this, key );
 			} );

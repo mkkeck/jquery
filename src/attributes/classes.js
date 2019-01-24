@@ -6,10 +6,14 @@ define( [
 	"../var/getAttr",
 	"../var/setAttr",
 	"../var/domType",
+	"../var/typeOf",
 	"../var/undef",
 
 	"../core/init"
-], function( jQuery, rnotwhite, dataPriv, strreplace, getAttr, setAttr, domType, undef ) {
+], function(
+  jQuery, rnotwhite, dataPriv,
+  strreplace, getAttr, setAttr, domType, typeOf, undef
+) {
 
 var rclass = /[\t\r\n\f]/g;
 
@@ -28,7 +32,7 @@ jQuery.fn.extend( {
 			} );
 		}
 
-		if ( typeof value === "string" && value ) {
+		if ( typeOf( value, "str" ) && value ) {
 			classes = value.match( rnotwhite ) || [];
 
 			while ( ( elem = that[ i++ ] ) ) {
@@ -70,7 +74,7 @@ jQuery.fn.extend( {
 			return that.attr( "class", "" );
 		}
 
-		if ( typeof value === "string" && value ) {
+		if ( typeOf( value, "str" ) && value ) {
 			classes = value.match( rnotwhite ) || [];
 
 			while ( ( elem = that[ i++ ] ) ) {
@@ -105,7 +109,7 @@ jQuery.fn.extend( {
 	toggleClass: function( value, stateVal ) {
 		var type = typeof value, that = this;
 
-		if ( typeof stateVal === "boolean" && type === "string" ) {
+		if ( typeOf( stateVal, "bool" ) && type === "string" ) {
 			return stateVal ? that.addClass( value ) : that.removeClass( value );
 		}
 

@@ -11,6 +11,7 @@ define( [
 	"./var/domParent",
 	"./var/evtListenerAdd",
 	"./var/evtListenerRemove",
+  "./var/typeOf",
   "./var/notdef",
 	"./var/undef",
 
@@ -19,7 +20,7 @@ define( [
 ], function(
 	jQuery, document, rnotwhite, slice, dataPriv,
 	getDocElem, getOwnDoc, domNode, domType, domParent,
-	evtListenerAdd, evtListenerRemove, notdef, undef
+	evtListenerAdd, evtListenerRemove, typeOf, notdef, undef
 ) {
 
 var
@@ -47,10 +48,10 @@ function on( elem, types, selector, data, fn, one ) {
 	var origFn, type;
 
 	// Types can be a map of types/handlers
-	if ( typeof types === "object" ) {
+	if ( typeOf( types, "obj" ) ) {
 
 		// ( types-Object, selector, data )
-		if ( typeof selector !== "string" ) {
+		if ( !typeOf( selector, "str" ) ) {
 
 			// ( types-Object, data )
 			data = data || selector;
@@ -68,7 +69,7 @@ function on( elem, types, selector, data, fn, one ) {
 		fn = selector;
 		data = selector = undef;
 	} else if ( fn == null ) {
-		if ( typeof selector === "string" ) {
+		if ( typeOf( selector, "str" ) ) {
 
 			// ( types, selector, fn )
 			fn = data;
@@ -145,7 +146,7 @@ jQuery.event = {
 
 				// Discard the second event of a jQuery.event.trigger() and
 				// when an event is called after a page has unloaded
-				return typeof jQuery !== notdef && jQuery.event.triggered !== e.type ?
+				return !typeOf( jQuery, notdef ) && jQuery.event.triggered !== e.type ?
 					jQuery.event.dispatch.apply( elem, arguments ) : undef;
 			};
 		}
@@ -706,7 +707,7 @@ jQuery.fn.extend( {
 			);
 			return t;
 		}
-		if ( typeof types === "object" ) {
+		if ( typeOf( types, "obj" ) ) {
 
 			// ( types-object [, selector] )
 			for ( type in types ) {
@@ -714,7 +715,7 @@ jQuery.fn.extend( {
 			}
 			return t;
 		}
-		if ( selector === false || typeof selector === "function" ) {
+		if ( selector === false || typeOf( selector, "fn" ) ) {
 
 			// ( types [, fn] )
 			fn = selector;

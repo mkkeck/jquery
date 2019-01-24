@@ -16,11 +16,12 @@ define( [
   "./var/domType",
   "./var/domParent",
   "./ajax/var/mimescript",
+  "./var/typeOf",
   "./var/undef"
 ], function(
 	arr, document, slice, concat, push, indexOf, class2type, toString, hasOwn,
 	support, createElem, strlower, strreplace, domNode, domType, domParent,
-  mimescript, undef
+  mimescript, typeOf, undef
 ) {
 
 var
@@ -142,7 +143,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 		deep = false;
 
 	// Handle a deep copy situation
-	if ( typeof target === "boolean" ) {
+	if ( typeOf( target, "bool" ) ) {
 		deep = target;
 
 		// Skip the boolean and the target
@@ -151,7 +152,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 	}
 
 	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {
+	if ( !typeOf( target, "obj" ) && !jQuery.isFunction( target ) ) {
 		target = {};
 	}
 
@@ -276,7 +277,7 @@ jQuery.extend( {
 		}
 
 		// Support: Android<4.0, iOS<6 (functionish RegExp)
-		return /^obj|fun/.test( typeof obj ) ?
+		return /^obj|func/.test( typeof obj ) ?
 			class2type[ toString.call( obj ) ] || "object" :
 			typeof obj;
 	},
@@ -354,7 +355,7 @@ jQuery.extend( {
 		if ( arr != null ) {
 			if ( isArrayLike( Object( arr ) ) ) {
 				jQuery.merge( ret,
-					typeof arr === "string" ?
+					typeOf( arr, "str" ) ?
 					[ arr ] : arr
 				);
 			} else {
@@ -442,7 +443,7 @@ jQuery.extend( {
 	proxy: function( fn, context ) {
 		var tmp, args, proxy;
 
-		if ( typeof context === "string" ) {
+		if ( typeOf( context, "str" ) ) {
 			tmp = fn[ context ];
 			context = fn;
 			fn = tmp;
@@ -478,7 +479,7 @@ jQuery.extend( {
 // unguarded in another place, it seems safer to just disable JSHint for these
 // three lines.
 /* jshint ignore: start */
-if ( typeof Symbol === "function" ) {
+if ( typeOf( Symbol, "fn" ) ) {
 	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];
 }
 /* jshint ignore: end */
@@ -503,7 +504,7 @@ function isArrayLike( obj ) {
 	}
 
 	return type === "array" || length === 0 ||
-		typeof length === "number" && length > 0 && ( length - 1 ) in obj;
+		typeOf( length, "num" ) && length > 0 && ( length - 1 ) in obj;
 }
 
 return jQuery;

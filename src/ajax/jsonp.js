@@ -4,17 +4,18 @@ define( [
 	"./var/rquery",
 	"../var/strreplace",
 
-  "./var/mimeappform",
-  "./var/mimescript",
-  "./var/mimejson",
+	"./var/mimeappform",
+	"./var/mimescript",
+	"./var/mimejson",
 
+	"../var/typeOf",
 	"../var/undef",
 
 	"../ajax"
 ], function(
   jQuery, nonce, rquery, strreplace,
   mimeappform, mimescript, mimejson,
-  undef
+  typeOf, undef
 ) {
 
 var oldCallbacks = [],
@@ -38,7 +39,7 @@ jQuery.ajaxPrefilter( mimejson + " " + mimejson + "p", function( s, originalSett
 		jsonCB = jsonp + "Callback",
 		jsonProp = s[ jsonp ] !== false && ( rjsonp.test( s.url ) ?
 			"url" :
-			typeof s.data === "string" &&
+			typeOf( s.data, "str" ) &&
 				( s.contentType || "" )
 					.indexOf( mimeappform ) === 0 &&
 				rjsonp.test( s.data ) && "data"

@@ -7,12 +7,13 @@ define( [
 	"../data/var/dataPriv",
 	"../data/var/acceptData",
 	"../var/hasOwn",
+	"../var/typeOf",
 	"../var/undef",
 
 	"../event"
 ], function(
 	jQuery, document, getOwnDoc, domType, domParent, dataPriv,
-	acceptData, hasOwn, undef
+	acceptData, hasOwn, typeOf, undef
 ) {
 
 var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/;
@@ -51,7 +52,7 @@ jQuery.extend( jQuery.event, {
 		// Caller can pass in a jQuery.Event object, Object, or just an event type string
 		event = event[ jQuery.expando ] ?
 			event :
-			new jQuery.Event( type, typeof event === "object" && event );
+			new jQuery.Event( type, typeOf( event, "obj" ) && event );
 
 		// Trigger bitmask: & 1 for native handlers; & 2 for jQuery (always true)
 		event.isTrigger = onlyHandlers ? 2 : 3;

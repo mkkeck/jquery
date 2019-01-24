@@ -8,13 +8,14 @@ define( [
 	"./var/domParent",
 	"./var/domNext",
 	"./var/domPrev",
+	"./var/typeOf",
 
 	"./core/init",
 	"./traversing/findFilter",
 	"./selector"
 ], function(
 	jQuery, indexOf, dir, siblings, rneedsContext,
-	domType, domParent, domNext, domPrev
+	domType, domParent, domNext, domPrev, typeOf
 ) {
 
 var rparentsprev = /^(?:parents|prev(?:Until|All))/,
@@ -47,7 +48,7 @@ jQuery.fn.extend( {
 			i = 0,
 			l = that.length,
 			matched = [],
-			pos = rneedsContext.test( selectors ) || typeof selectors !== "string" ?
+			pos = rneedsContext.test( selectors ) || !typeOf( selectors, "str" ) ?
 				jQuery( selectors, context || that.context ) :
 				0;
 
@@ -82,7 +83,7 @@ jQuery.fn.extend( {
 		}
 
 		// Index in selector
-		if ( typeof elem === "string" ) {
+		if ( typeOf( elem, "str" ) ) {
 			return indexOf.call( jQuery( elem ), that[ 0 ] );
 		}
 
@@ -161,7 +162,7 @@ jQuery.each( {
 			selector = until;
 		}
 
-		if ( selector && typeof selector === "string" ) {
+		if ( selector && typeOf( selector, "str" ) ) {
 			matched = jQuery.filter( selector, matched );
 		}
 

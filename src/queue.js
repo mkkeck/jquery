@@ -1,11 +1,12 @@
 define( [
 	"./core",
 	"./data/var/dataPriv",
+	"./var/typeOf",
 	"./var/undef",
 
 	"./deferred",
 	"./callbacks"
-], function( jQuery, dataPriv, undef ) {
+], function( jQuery, dataPriv, typeOf, undef ) {
 
 jQuery.extend( {
 	queue: function( elem, type, data ) {
@@ -78,7 +79,7 @@ jQuery.fn.extend( {
 	queue: function( type, data ) {
 		var setter = 2;
 
-		if ( typeof type !== "string" ) {
+		if ( !typeOf( type, "str" ) ) {
 			data = type;
 			type = "fx";
 			setter--;
@@ -124,7 +125,7 @@ jQuery.fn.extend( {
 				}
 			};
 
-		if ( typeof type !== "string" ) {
+		if ( !typeOf( type, "str" ) ) {
 			obj = type;
 			type = undef;
 		}

@@ -1,7 +1,8 @@
 define( [
 	"./core",
-	"./var/rnotwhite"
-], function( jQuery, rnotwhite ) {
+	"./var/rnotwhite",
+  "./var/typeOf"
+], function( jQuery, rnotwhite, typeOf ) {
 
 // Convert String-formatted options into Object-formatted ones
 function createOptions( options ) {
@@ -38,7 +39,7 @@ jQuery.Callbacks = function( options ) {
 
 	// Convert options from String-formatted to Object-formatted if needed
 	// (we check in cache first)
-	options = typeof options === "string" ?
+	options = typeOf( options, "str" ) ?
 		createOptions( options ) :
 		jQuery.extend( {}, options );
 

@@ -7,10 +7,14 @@ define( [
 	"../var/domNode",
 	"../var/domType",
 	"../var/domParent",
+	"../var/typeOf",
 	"../var/undef",
 
 	"../core/init"
-], function( jQuery, support, strlower, strreplace, getAttr, domNode, domType, domParent, undef ) {
+], function(
+  jQuery, support,
+  strlower, strreplace, getAttr, domNode, domType, domParent, typeOf, undef
+) {
 
 var rreturn = /\r/g,
 	rspaces = /[\x20\t\r\n\f]+/g;
@@ -35,7 +39,7 @@ jQuery.fn.extend( {
 
 				ret = elem.value;
 
-				return typeof ret === "string" ?
+				return typeOf( ret, "str" ) ?
 
 					// Handle most common string cases
 					strreplace( ret, rreturn, "" ) :
@@ -66,7 +70,7 @@ jQuery.fn.extend( {
 			if ( val == null ) {
 				val = "";
 
-			} else if ( typeof val === "number" ) {
+			} else if ( typeOf( val, "num" ) ) {
 				val += "";
 
 			} else if ( jQuery.isArray( val ) ) {

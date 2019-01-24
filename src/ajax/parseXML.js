@@ -1,13 +1,14 @@
 define( [
 	"../core",
   "../var/getByTag",
+  "../var/typeOf",
   "../var/undef"
-], function( jQuery, getByTag, undef ) {
+], function( jQuery, getByTag, typeOf, undef ) {
 
 // Cross-browser xml parsing
 jQuery.parseXML = function( data ) {
 	var xml;
-	if ( !data || typeof data !== "string" ) {
+	if ( !data || !typeOf( data, "str" ) ) {
 		return null;
 	}
 

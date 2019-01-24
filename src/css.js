@@ -19,6 +19,7 @@ define( [
 	"./var/createElem",
 	"./var/domNode",
 	"./var/domType",
+  "./var/typeOf",
 	"./var/undef",
 
 	"./core/init",
@@ -27,7 +28,7 @@ define( [
 ], function(
 	jQuery, pnum, access, rmargin, document, rcssNum, rnumnonpx, cssExpand, isHidden,
 	getStyles, swap, curCSS, adjustCSS, defaultDisplay, addGetHookIf, support, dataPriv,
-	createElem, domNode, domType, undef
+	createElem, domNode, domType, typeOf, undef
 ) {
 
 var
@@ -455,7 +456,7 @@ jQuery.each( {
 				expanded = {},
 
 				// Assumes a single number if not a string
-				parts = typeof value === "string" ? value.split( " " ) : [ value ];
+				parts = typeOf( value, "str" ) ? value.split( " " ) : [ value ];
 
 			for ( ; i < 4; i++ ) {
 				expanded[ prefix + cssExpand[ i ] + suffix ] =
@@ -501,7 +502,7 @@ jQuery.fn.extend( {
 		return showHide( this );
 	},
 	toggle: function( state ) {
-		if ( typeof state === "boolean" ) {
+		if ( typeOf( state, "bool" ) ) {
 			return state ? this.show() : this.hide();
 		}
 

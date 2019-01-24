@@ -7,11 +7,12 @@ define( [
 	"../var/getOwnDoc",
 	"../var/domType",
 	"../var/domParent",
+	"../var/typeOf",
 	"../var/undef",
 	"../traversing/findFilter"
 ], function(
 	jQuery, document, rsingleTag,
-	getById, getOwnDoc, domType, domParent, undef
+	getById, getOwnDoc, domType, domParent, typeOf, undef
 ) {
 
 // A central reference to the root jQuery(document)
@@ -38,7 +39,7 @@ var rootjQuery,
 		root = root || rootjQuery;
 
 		// Handle HTML strings
-		if ( typeof selector === "string" ) {
+		if ( typeOf( selector, "str" ) ) {
 			if ( selector[ 0 ] === "<" &&
 				selector[ selector.length - 1 ] === ">" &&
 				selector.length >= 3 ) {

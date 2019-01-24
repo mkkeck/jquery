@@ -27,6 +27,7 @@ define( [
 	"./var/domParent",
 	"./var/domNext",
 	"./ajax/var/mimescript",
+	"./var/typeOf",
 	"./var/undef",
 
 	"./core/init",
@@ -37,7 +38,7 @@ define( [
 	jQuery, concat, push, access, rcheckableType, rtagName, rscriptType,
 	wrapMap, getAll, setGlobalEval, buildFragment, support, dataPriv, dataUser, acceptData,
 	createElem, strlower, strreplace, getByTag, getOwnDoc, getAttr, domNode, domType,
-	domParent, domNext, mimescript, undef
+	domParent, domNext, mimescript, typeOf, undef
 ) {
 
 var
@@ -145,7 +146,7 @@ function domManip( collection, args, callback, ignored ) {
 
 	// We can't cloneNode fragments that contain checked, in WebKit
 	if ( isFunction ||
-			( l > 1 && typeof value === "string" &&
+			( l > 1 && typeOf( value, "str" ) &&
 				!support.checkClone && rchecked.test( value ) ) ) {
 		return collection.each( function( index ) {
 			var self = collection.eq( index );
@@ -429,7 +430,7 @@ jQuery.fn.extend( {
 			}
 
 			// See if we can take a shortcut and just use innerHTML
-			if ( typeof value === "string" && !rnoInnerhtml.test( value ) &&
+			if ( typeOf( value, "str" ) && !rnoInnerhtml.test( value ) &&
 				!wrapMap[ strlower( ( rtagName.exec( value ) || [ "", "" ] )[ 1 ] ) ] ) {
 
 				value = jQuery.htmlPrefilter( value );

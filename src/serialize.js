@@ -3,11 +3,13 @@ define( [
 	"./manipulation/var/rcheckableType",
 	"./var/domNode",
 	"./var/strreplace",
+	"./var/typeOf",
+	"./var/undef",
 
 	"./core/init",
 	"./traversing", // filter
 	"./attributes/prop"
-], function( jQuery, rcheckableType, domNode, strreplace ) {
+], function( jQuery, rcheckableType, domNode, strreplace, typeOf, undef ) {
 
 var r20 = /%20/g,
 	rbracket = /\[\]$/,
@@ -31,7 +33,7 @@ function buildParams( prefix, obj, traditional, add ) {
 
 				// Item is non-scalar (array or object), encode its numeric index.
 				buildParams(
-					prefix + "[" + ( typeof v === o && v != null ? i : "" ) + "]",
+					prefix + "[" + ( typeOf( v, o ) && v != null ? i : "" ) + "]",
 					v,
 					traditional,
 					add
@@ -67,7 +69,7 @@ jQuery.param = function( a, traditional ) {
 		};
 
 	// Set traditional to true for jQuery <= 1.3.2 behavior.
-	if ( traditional === undefined ) {
+	if ( traditional === undef ) {
 		traditional = settings && settings.traditional;
 	}
 
@@ -112,15 +114,15 @@ jQuery.fn.extend( {
 				( t.checked || !rcheckableType.test( type ) );
 		} )
 		.map( function( i, elem ) {
-			var val = jQuery( this ).val();
+			var val = jQuery( this ).val(), nl = "\r\n";
 
 			return val == null ?
 				null :
 				jQuery.isArray( val ) ?
 					jQuery.map( val, function( val ) {
-						return { name: elem.name, value: strreplace( val, rCRLF, "\r\n" ) };
+						return { name: elem.name, value: strreplace( val, rCRLF, nl ) };
 					} ) :
-					{ name: elem.name, value: strreplace( val, rCRLF, "\r\n" ) };
+					{ name: elem.name, value: strreplace( val, rCRLF, nl ) };
 		} ).get();
 	}
 } );

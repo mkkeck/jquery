@@ -1,9 +1,10 @@
 define( [
 	"./core",
 
-//	"./var/arr",
-//	"./var/push",
-//	"./var/slice",
+	"./var/hasOwn",
+	"./var/arr",
+	"./var/push",
+	"./var/slice",
 	"./var/rinputs",
 	"./var/strlower",
 	"./var/strreplace",
@@ -28,7 +29,7 @@ define( [
 ], function(
 	jQuery,
 
-  // arr, push, slice, rinputs,
+  hasOwn, arr, push, slice, rinputs,
 
 	strlower, strreplace, createElem, getElem, getById, getByTag, getOwnDoc, getDocElem,
 	getAttr, setAttr, domNode, domType, domParent, domNext, domPrev,

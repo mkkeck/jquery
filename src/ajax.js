@@ -9,17 +9,21 @@ define( [
 	"./var/domType",
 	"./var/strlower",
 	"./var/strreplace",
+	"./var/typeOf",
 
 	"./ajax/var/mimeappform",
 	"./ajax/var/mimeappxml",
-  "./ajax/var/mimeappxecma",
-  "./ajax/var/mimeappecma",
-  "./ajax/var/mimeappjs",
-  "./ajax/var/mimeappjson",
-  "./ajax/var/mimetextjs",
-  "./ajax/var/mimescript",
+	"./ajax/var/mimeappxecma",
+	"./ajax/var/mimeappecma",
+	"./ajax/var/mimeappjs",
+	"./ajax/var/mimeappjson",
+	"./ajax/var/mimetextjs",
+	"./ajax/var/mimescript",
   "./ajax/var/mimejson",
-
+	"./ajax/var/xmlHttpRequest",
+	"./ajax/var/ajaxSettings",
+	 "./var/clearTimeout",
+	 "./var/setTimeout",
 	"./var/undef",
 
 	"./core/init",
@@ -29,10 +33,11 @@ define( [
 	"./deferred"
 ], function(
 	jQuery, document, rnotwhite, location, nonce, rquery,
-	createElem, domType, strlower, strreplace,
-  mimeappform, mimeappxml, mimeappxecma, mimeappecma, mimeappjs, mimeappjson,
-  mimetextjs, mimescript, mimejson,
-  undef
+	createElem, domType, strlower, strreplace, typeOf,
+	mimeappform, mimeappxml, mimeappxecma, mimeappecma, mimeappjs, mimeappjson,
+	mimetextjs, mimescript, mimejson, xmlHttpRequest, ajaxSettings,
+	clearTimeout, setTimeout,
+	undef
 ) {
 
 var
@@ -77,7 +82,7 @@ function addToPrefiltersOrTransports( structure ) {
 	// dataTypeExpression is optional and defaults to "*"
 	return function( dataTypeExpression, func ) {
 
-		if ( typeof dataTypeExpression !== "string" ) {
+		if ( !typeOf( dataTypeExpression, "str" ) ) {
 			func = dataTypeExpression;
 			dataTypeExpression = "*";
 		}
@@ -116,7 +121,7 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 		inspected[ dataType ] = true;
 		( structure[ dataType ] || [] ).forEach( function( prefilterOrFactory ) {
 			var dataTypeOrTransport = prefilterOrFactory( options, originalOptions, jqXHR );
-			if ( typeof dataTypeOrTransport === "string" &&
+			if ( typeOf( dataTypeOrTransport, "str" ) &&
 				!seekingTransport && !inspected[ dataTypeOrTransport ] ) {
 
 				options.dataTypes.unshift( dataTypeOrTransport );
@@ -137,7 +142,7 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 // Fixes #9887
 function ajaxExtend( target, src ) {
 	var key, deep,
-		flatOptions = jQuery.ajaxSettings.flatOptions || {};
+		flatOptions = jQuery[ ajaxSettings ].flatOptions || {};
 
 	for ( key in src ) {
 		if ( src[ key ] !== undef ) {
@@ -392,10 +397,10 @@ jQuery.extend( {
 		return settings ?
 
 			// Building a settings object
-			ajaxExtend( ajaxExtend( target, jQuery.ajaxSettings ), settings ) :
+			ajaxExtend( ajaxExtend( target, jQuery[ ajaxSettings ] ), settings ) :
 
 			// Extending ajaxSettings
-			ajaxExtend( jQuery.ajaxSettings, target );
+			ajaxExtend( jQuery[ ajaxSettings ], target );
 	},
 
 	ajaxPrefilter: addToPrefiltersOrTransports( prefilters ),
@@ -405,7 +410,7 @@ jQuery.extend( {
 	ajax: function( url, options ) {
 
 		// If url is an object, simulate pre-1.5 signature
-		if ( typeof url === "object" ) {
+		if ( typeOf( url, "obj" ) ) {
 			options = url;
 			url = undef;
 		}
@@ -584,7 +589,7 @@ jQuery.extend( {
 		}
 
 		// Convert data if not already a string
-		if ( s.data && s.processData && typeof s.data !== "string" ) {
+		if ( s.data && s.processData && !typeOf( s.data, "str" ) ) {
 			s.data = jQuery.param( s.data, s.traditional );
 		}
 
@@ -704,7 +709,7 @@ jQuery.extend( {
 
 			// Timeout
 			if ( s.async && s.timeout > 0 ) {
-				timeoutTimer = window.setTimeout( function() {
+				timeoutTimer = window[ setTimeout ]( function() {
 					jqXHR.abort( "timeout" );
 				}, s.timeout );
 			}
@@ -740,7 +745,7 @@ jQuery.extend( {
 
 			// Clear timeout if it exists
 			if ( timeoutTimer ) {
-				window.clearTimeout( timeoutTimer );
+				window[ clearTimeout ]( timeoutTimer );
 			}
 
 			// Dereference transport for early garbage collection

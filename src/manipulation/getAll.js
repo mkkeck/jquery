@@ -3,9 +3,10 @@ define( [
   "../var/getByTag",
   "../var/getByQSA",
   "../var/domNode",
+  "../var/typeOf",
   "../var/notdef",
   "../var/undef"
-], function( jQuery, getByTag, getByQSA, domNode, notdef, undef ) {
+], function( jQuery, getByTag, getByQSA, domNode, typeOf, notdef, undef ) {
 
 function getAll( context, tag ) {
 
@@ -13,9 +14,9 @@ function getAll( context, tag ) {
 	// Use typeof to avoid zero-argument method invocation on host objects (#15151)
 	var
 		query = tag || "*",
-		ret = typeof context[ getByTag ] !== notdef ?
+		ret = !typeOf( context[ getByTag ], notdef ) ?
 			context[ getByTag ]( query ) :
-			typeof context[ getByQSA ] !== notdef ?
+			!typeOf( context[ getByQSA ], notdef ) ?
 				context[ getByQSA ]( query ) :
 			[];
 

@@ -2,10 +2,11 @@ define( [
 	"../core",
 	"../var/indexOf",
 	"../var/domType",
+	"../var/typeOf",
 	"./var/rneedsContext",
 
 	"../selector"
-], function( jQuery, indexOf, domType, rneedsContext ) {
+], function( jQuery, indexOf, domType, typeOf, rneedsContext ) {
 
 var risSimple = /^.[^:#\[\.,]*$/;
 
@@ -26,7 +27,7 @@ function winnow( elements, qualifier, not ) {
 
 	}
 
-	if ( typeof qualifier === "string" ) {
+	if ( typeOf( qualifier, "str" ) ) {
 		if ( risSimple.test( qualifier ) ) {
 			return jQuery.filter( qualifier, elements, not );
 		}
@@ -60,7 +61,7 @@ jQuery.fn.extend( {
 			self = this,
 			len = self.length;
 
-		if ( typeof selector !== "string" ) {
+		if ( !typeOf( selector, "str" ) ) {
 			return self.pushStack( jQuery( selector ).filter( function() {
 				for ( i = 0; i < len; i++ ) {
 					if ( jQuery.contains( self[ i ], this ) ) {
@@ -91,7 +92,7 @@ jQuery.fn.extend( {
 
 			// If this is a positional/relative selector, check membership in the returned set
 			// so $("p:first").is("p:last") won't return true for a doc with two "p".
-			typeof selector === "string" && rneedsContext.test( selector ) ?
+      typeOf( selector, "str" ) && rneedsContext.test( selector ) ?
 				jQuery( selector ) :
 				selector || [],
 			false

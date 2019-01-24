@@ -1,5 +1,6 @@
 define( [
 	"../core",
+	"../var/typeOf",
 	"../var/undef",
 	"../core/parseHTML",
 	"../ajax",
@@ -9,7 +10,7 @@ define( [
 
 	// Optional event/alias dependency
 	"../event/alias"
-], function( jQuery, undef ) {
+], function( jQuery, typeOf, undef ) {
 
 // Keep a copy of the old load method
 var _load = jQuery.fn.load;
@@ -18,7 +19,7 @@ var _load = jQuery.fn.load;
  * Load a url into a page
  */
 jQuery.fn.load = function( url, params, callback ) {
-	if ( typeof url !== "string" && _load ) {
+	if ( !typeOf( url, "str" ) && _load ) {
 		return _load.apply( this, arguments );
 	}
 
@@ -39,7 +40,7 @@ jQuery.fn.load = function( url, params, callback ) {
 		params = undef;
 
 	// Otherwise, build a param string
-	} else if ( params && typeof params === "object" ) {
+	} else if ( params && typeOf( params, "obj" ) ) {
 		type = "POST";
 	}
 

@@ -13,8 +13,8 @@
  */
 
 (function( global, factory ) {
-
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
+  var o = "object", e = "exports", d = "document";
+	if ( typeof module === o && typeof module[ e ] === o ) {
 		// For CommonJS and CommonJS-like environments where a proper `window`
 		// is present, execute the factory and get jQuery.
 		// For environments that do not have a `window` with a `document`
@@ -22,11 +22,11 @@
 		// This accentuates the need for the creation of a real `window`.
 		// e.g. var jQuery = require("jquery")(window);
 		// See ticket #14549 for more info.
-		module.exports = global.document ?
+		module[ e ] = global[ d ] ?
 			factory( global, true ) :
 			function( w ) {
-				if ( !w.document ) {
-					throw new Error( "jQuery requires a window with a document" );
+				if ( !w[ d ] ) {
+					throw new Error( "jQuery requires a window with a " + d );
 				}
 				return factory( w );
 			};
@@ -35,7 +35,7 @@
 	}
 
 // Pass this if window is not defined yet
-}(typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
+}(typeof window !== "undefined" ? window : this, function( window, noGlobal ) {;
 
 // Support: Firefox 18+
 // Can't be in strict mode, several libs including ASP.NET trace

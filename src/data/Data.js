@@ -3,8 +3,9 @@ define( [
 	"../var/rnotwhite",
 	"./var/acceptData",
   "../var/domType",
+  "../var/typeOf",
   "../var/undef"
-], function( jQuery, rnotwhite, acceptData, domType, undef ) {
+], function( jQuery, rnotwhite, acceptData, domType, typeOf, undef ) {
 
 function Data() {
 	this.expando = jQuery.expando + Data.uid++;
@@ -82,7 +83,7 @@ Data.prototype = {
 			cache = this.cache( owner );
 
 		// Handle: [ owner, key, value ] args
-		if ( typeof data === "string" ) {
+		if ( typeOf( data, "str" ) ) {
 			cache[ data ] = value;
 
 		// Handle: [ owner, { properties } ] args
@@ -116,7 +117,7 @@ Data.prototype = {
 		//   2. The data stored at the key
 		//
 		if ( key === undef ||
-				( ( key && typeof key === "string" ) && value === undef ) ) {
+				( ( key && typeOf( key, "str" ) ) && value === undef ) ) {
 
 			stored = this.get( owner, key );
 

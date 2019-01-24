@@ -4,10 +4,15 @@ define( [
 	"../var/evtListenerAdd",
 	"../var/evtListenerRemove",
 	"../var/getDocElem",
+	"../var/setTimeout",
 
 	"../core/init",
 	"../deferred"
-], function( jQuery, document, evtListenerAdd, evtListenerRemove, getDocElem ) {
+], function(
+	jQuery, document,
+	evtListenerAdd, evtListenerRemove,
+	getDocElem, setTimeout
+) {
 
 // The deferred used on DOM ready
 var readyList, domLoaded = "DOMContentLoaded";
@@ -88,7 +93,7 @@ jQuery.ready.promise = function( obj ) {
 			( drs !== "loading" && !document[ getDocElem ].doScroll ) ) {
 
 			// Handle it asynchronously to allow scripts the opportunity to delay ready
-			window.setTimeout( jQuery.ready );
+			window[ setTimeout ]( jQuery.ready );
 
 		} else {
 

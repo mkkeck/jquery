@@ -1,8 +1,10 @@
 define( [
 	"../core",
 	"../queue",
+	"../var/setTimeout",
+	"../var/clearTimeout",
 	"../effects" // Delay is optional because of this dependency
-], function( jQuery ) {
+], function( jQuery, setTimeout, clearTimeout ) {
 
 // Based off of the plugin by Clint Helfers, with permission.
 // http://web.archive.org/web/20100324014747/http://blindsignals.com/index.php/2009/07/jquery-delay/
@@ -11,9 +13,9 @@ jQuery.fn.delay = function( time, type ) {
 	type = type || "fx";
 
 	return this.queue( type, function( next, hooks ) {
-		var timeout = window.setTimeout( next, time );
+		var timeout = window[ setTimeout ]( next, time );
 		hooks.stop = function() {
-			window.clearTimeout( timeout );
+      window[ clearTimeout ]( timeout );
 		};
 	} );
 };

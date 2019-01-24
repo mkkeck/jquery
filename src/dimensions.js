@@ -3,10 +3,11 @@ define( [
 	"./core/access",
 	"./var/getDocElem",
 	"./var/domType",
+	"./var/typeOf",
 	"./var/undef",
 
 	"./css"
-], function( jQuery, access, getDocElem, domType, undef ) {
+], function( jQuery, access, getDocElem, domType, typeOf, undef ) {
 
 // Create innerHeight, innerWidth, height, width, outerHeight and outerWidth methods
 jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
@@ -15,7 +16,7 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 
 		// Margin is only for outerHeight, outerWidth
 		jQuery.fn[ funcName ] = function( margin, value ) {
-			var chainable = arguments.length && ( defaultExtra || typeof margin !== "boolean" ),
+			var chainable = arguments.length && ( defaultExtra || !typeOf( margin, "bool" ) ),
 				extra = defaultExtra || ( margin === true || value === true ? "margin" : "border" );
 
 			return access( this, function( elem, type, value ) {

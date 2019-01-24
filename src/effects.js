@@ -10,6 +10,10 @@ define( [
 	"./data/var/dataPriv",
 	"./var/domNode",
 	"./var/domType",
+	"./var/setInterval",
+	"./var/clearInterval",
+	"./var/setTimeout",
+	"./var/typeOf",
 	"./var/undef",
 
 	"./core/init",
@@ -18,8 +22,11 @@ define( [
 	"./css",
 	"./deferred",
 	"./traversing"
-], function( jQuery, document, rcssNum, cssExpand, rnotwhite,
-	isHidden, adjustCSS, defaultDisplay, dataPriv, domNode, domType, undef ) {
+], function(
+	jQuery, document, rcssNum, cssExpand, rnotwhite,
+	isHidden, adjustCSS, defaultDisplay, dataPriv, domNode, domType,
+	setInterval, clearInterval, setTimeout, typeOf, undef
+) {
 var
 	fxNow, timerId,
 	rfxtypes = /^(?:toggle|show|hide)$/,
@@ -27,7 +34,7 @@ var
 
 // Animations created synchronously will run synchronously
 function createFxNow() {
-	window.setTimeout( function() {
+	window[ setTimeout ]( function() {
 		fxNow = undef;
 	} );
 	return ( fxNow = jQuery.now() );
@@ -410,14 +417,14 @@ jQuery.speed = function( speed, easing, fn ) {
 		isFn = "isFunction",
 		d = "duration", s = "speeds", q = "queue",
 		fx = jQuery.fx,
-		opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
+		opt = speed && typeOf( speed, "obj" ) ? jQuery.extend( {}, speed ) : {
 		complete: fn || !fn && easing ||
 			jQuery[ isFn ]( speed ) && speed,
 		duration: speed,
 		easing: fn && easing || easing && !jQuery[ isFn ]( easing ) && easing
 	};
 
-	opt[ d ] = fx.off ? 0 : typeof opt[ d ] === "number" ?
+	opt[ d ] = fx.off ? 0 : typeOf( opt[ d ], "num" ) ?
 		opt[ d ] : opt[ d ] in fx[ s ] ?
 			fx[ s ] [ opt[ d ] ] : fx[ s ]._default;
 
@@ -477,7 +484,7 @@ jQuery.fn.extend( {
 			stop( gotoEnd );
 		};
 
-		if ( typeof type !== "string" ) {
+		if ( !typeOf( type, "str" ) ) {
 			gotoEnd = clearQueue;
 			clearQueue = type;
 			type = undef;
@@ -568,7 +575,7 @@ jQuery.fn.extend( {
 [ "toggle", "show", "hide" ].forEach( function( name ) {
 	var cssFn = jQuery.fn[ name ];
 	jQuery.fn[ name ] = function( speed, easing, callback ) {
-		return speed == null || typeof speed === "boolean" ?
+		return speed == null || typeOf( speed, "bool" ) ?
 			cssFn.apply( this, arguments ) :
 			this.animate( genFx( name, true ), speed, easing, callback );
 	};
@@ -623,12 +630,12 @@ jQuery.fx.timer = function( timer ) {
 jQuery.fx.interval = 13;
 jQuery.fx.start = function() {
 	if ( !timerId ) {
-		timerId = window.setInterval( jQuery.fx.tick, jQuery.fx.interval );
+		timerId = window[ setInterval ]( jQuery.fx.tick, jQuery.fx.interval );
 	}
 };
 
 jQuery.fx.stop = function() {
-	window.clearInterval( timerId );
+	window[ clearInterval ]( timerId );
 
 	timerId = null;
 };
