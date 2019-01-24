@@ -51,12 +51,15 @@
     MAX_NEGATIVE = 1 << 31,
 
     // Instance methods
-    hasOwn = ( {} ).hasOwnProperty,
-    arr = [],
+    // hasOwn = ( {} ).hasOwnProperty,
+
+    // arr = [],
     pop = arr.pop,
     pushNative = arr.push,
-    push = arr.push,
-    slice = arr.slice,
+
+    // push = arr.push,
+    // slice = arr.slice,
+
     matchSelector = "atchesSelector",
     MatchSelector = "M" + matchSelector,
 
@@ -97,6 +100,20 @@
       return ( "" + str ).replace( expr, repl || "" );
     },
 
+    // remove in jQuery
+    typeOf = function( obj, type ) {
+      if ( /^a/.test( type ) ) {
+        return ( obj instanceof Array );
+      }
+      if ( /^fn/.test( type ) ) {
+        type = "func";
+      } else if ( /^s/.test( type ) && !/^sy/.test( type ) ) {
+        type = "str";
+      }
+      type = new RegExp( "^" + type, "i" );
+      return ( type.test( typeof obj ) );
+    },
+
     /**/
 
     // Use a stripped-down indexOf as it's faster than native
@@ -111,7 +128,7 @@
     },
 
     regExp = function( expr, flag ) {
-      return ( typeof flag === notdef ) ?
+      return typeOf( flag, notdef ) ?
         new RegExp( expr ) :
         new RegExp( expr, flag );
     },
@@ -320,7 +337,7 @@
 
     // Return early from calls with invalid selector or context
     if (
-      typeof selector !== "string" || !selector ||
+      !typeOf( selector, "str" ) || !selector ||
       nodeType !== 1 && nodeType !== 9 && nodeType !== 11
     ) {
       return results;
@@ -603,7 +620,7 @@
    * @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
    */
   function testContext( context ) {
-    return context && typeof context[ getByTag ] !== notdef && context;
+    return context && !typeOf( context[ getByTag ], notdef ) && context;
   }
 
   // Expose support vars for convenience
@@ -698,7 +715,7 @@
     // ID find and filter
     if ( support.getById ) {
       Expr.find.ID = function( id, context ) {
-        if ( typeof context[ getById ] !== notdef && documentIsHTML ) {
+        if ( !typeOf( context[ getById ], notdef ) && documentIsHTML ) {
           var m = context[ getById ]( id );
           return m ? [ m ] : [];
         }
@@ -718,7 +735,7 @@
       Expr.filter.ID =  function( id ) {
         var attrId = strreplace( id, runescape, funescape );
         return function( elem ) {
-          var node = typeof elem[ getAttr + "Node" ] !== notdef &&
+          var node = !typeOf( elem[ getAttr + "Node" ], notdef ) &&
             elem[ getAttr + "Node" ]( "id" );
           return node && node.value === attrId;
         };
@@ -728,7 +745,7 @@
     // Tag
     Expr.find.TAG = support[ getByTag ] ?
       function( tag, context ) {
-        if ( typeof context[ getByTag ] !== notdef ) {
+        if ( !typeOf( context[ getByTag ], notdef ) ) {
           return context[ getByTag ]( tag );
 
           // DocumentFragment nodes don't have gEBTN
@@ -760,7 +777,7 @@
 
     // Class
     Expr.find.CLASS = support[ getByClass ] && function( className, context ) {
-      if ( typeof context[ getByClass ] !== notdef && documentIsHTML ) {
+      if ( !typeOf( context[ getByClass ], notdef ) && documentIsHTML ) {
         return context[ getByClass ]( className );
       }
     };
@@ -1162,7 +1179,7 @@
 
       // Use textContent for elements
       // innerText usage removed for consistency of new lines (jQuery #11153)
-      if ( typeof elem[ text ] === "string" ) {
+      if ( typeOf( elem[ text ], "str" ) ) {
         return elem[ text ];
       } else {
 
@@ -1308,8 +1325,8 @@
           classCache( className, function( elem ) {
             var attr = "className";
             return pattern.test(
-              typeof elem[ attr ] === "string" && elem[ attr ] ||
-              typeof elem[ getAttr ] !== notdef && elem[ getAttr ]( "class" ) || ""
+              typeOf( elem[ attr ], "str" ) && elem[ attr ] ||
+              !typeOf( elem[ getAttr ], notdef ) && elem[ getAttr ]( "class" ) || ""
             );
           } );
       },
@@ -2276,7 +2293,7 @@
    */
   select = Sizzle.select = function( selector, context, results, seed ) {
     var i, tokens, token, type, find,
-      compiled = typeof selector === "function" && selector,
+      compiled = typeOf( selector, "fn" ) && selector,
       match = !seed && tokenize( ( selector = compiled.selector || selector ) );
 
     results = results || [];
@@ -2439,7 +2456,7 @@
 
   // EXPOSE
 
-  if ( typeof define === "function" && define.amd ) {
+  if ( typeOf( define, "fn" ) && define.amd ) {
     define(
       function() {
         return Sizzle;
@@ -2447,7 +2464,7 @@
     );
 
     // Sizzle requires that there be a global window in Common-JS like environments
-  } else if ( typeof module !== notdef && module.exports ) {
+  } else if ( !typeOf( module, notdef ) && module.exports ) {
     module.exports = Sizzle;
   } else {
     window.Sizzle = Sizzle;
